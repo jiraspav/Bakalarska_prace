@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core" 
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    
+    <ui:composition>
+    <h:form>
+        <p:growl id="messages"/>  
+        <p:menu type="tiered" style="width:180px">  
+            <p:submenu label="#{msgs.menuMistnosti}" icon="ui-icon-refresh">  
+                <p:menuitem value="#{msgs.menuMistnostiMojeRezervace}" action="#{navigationBean.toMojeRezervacePage()}" ajax="false"/>  
+                <p:menuitem value="#{msgs.menuMistnostiVytvoreniRezervace}" action="#{navigationBean.toVytvoreniRezervacePage()}" ajax="false"/>  
+                <p:menuitem value="#{msgs.menuMistnostiNajitMistnost}" action="#{navigationBean.toVolneMistnostiPage()}" ajax="false"/>
+            </p:submenu>  
+            <p:submenu label="#{msgs.menuAdmin}" icon="ui-icon-extlink" rendered="#{LoginVerifier.isAdmin()}">  
+                <p:menuitem value="#{msgs.menuAdminAktualizaceDat}" action="#{navigationBean.toAdminPage()}" ajax="false"/>
+                <p:menuitem value="#{msgs.menuAdminSprávaÚctu}" action="#{navigationBean.toAdminAccountEditor()}" ajax="false"/>
+            </p:submenu>  
+            <p:menuitem value="#{msgs.menuOdhlasit}" action="#{LoginVerifier.logout()}" ajax="false" />
+
+
+        </p:menu>  
+    </h:form>
+        </ui:composition>
+</html>
