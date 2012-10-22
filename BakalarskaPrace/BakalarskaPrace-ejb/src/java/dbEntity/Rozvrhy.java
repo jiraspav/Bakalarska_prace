@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "rozvrhy")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Rozvrhy.findAll", query = "SELECT r FROM Rozvrhy r"),
-    @NamedQuery(name = "Rozvrhy.findByIDrozvrhu", query = "SELECT r FROM Rozvrhy r WHERE r.iDrozvrhu = :iDrozvrhu"),
+    @NamedQuery(name = Rozvrhy.FIND_ALL, query = "SELECT r FROM Rozvrhy r"),
+    @NamedQuery(name = Rozvrhy.FIND_ROZVRH_BY_ID, query = "SELECT r FROM Rozvrhy r WHERE r.iDrozvrhu = :iDrozvrhu"),
     @NamedQuery(name = "Rozvrhy.findByOd", query = "SELECT r FROM Rozvrhy r WHERE r.od = :od"),
     @NamedQuery(name = "Rozvrhy.findByDo1", query = "SELECT r FROM Rozvrhy r WHERE r.do1 = :do1"),
     @NamedQuery(name = "Rozvrhy.findByLichyTyden", query = "SELECT r FROM Rozvrhy r WHERE r.lichyTyden = :lichyTyden"),
@@ -62,6 +62,11 @@ public class Rozvrhy implements Serializable {
     @ManyToOne(optional = false)
     private Predmety iDpredmetu;
 
+    
+    public static final String FIND_ALL = "Rozvrhy.findAll";
+    public static final String FIND_ROZVRH_BY_ID = "Rozvrhy.findByIDrozvrhu";
+    
+    
     public Rozvrhy() {
     }
 

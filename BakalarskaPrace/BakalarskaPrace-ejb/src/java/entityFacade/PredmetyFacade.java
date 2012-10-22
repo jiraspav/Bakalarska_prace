@@ -5,6 +5,8 @@
 package entityFacade;
 
 import dbEntity.Predmety;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,4 +29,13 @@ public class PredmetyFacade extends AbstractFacade<Predmety> {
         super(Predmety.class);
     }
     
+    public void removeAll(){
+        
+        ArrayList<Predmety> predmetyAll = new ArrayList(this.findAll()) ;
+        Iterator iter = predmetyAll.iterator();
+        while(iter.hasNext()){
+            Predmety delete = (Predmety) iter.next();
+            this.remove(delete);
+        }
+    }
 }

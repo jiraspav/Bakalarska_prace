@@ -5,6 +5,8 @@
 package entityFacade;
 
 import dbEntity.Semestr;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,4 +29,14 @@ public class SemestrFacade extends AbstractFacade<Semestr> {
         super(Semestr.class);
     }
     
+    
+    public void removeAll(){
+        
+        ArrayList<Semestr> semestrAll = new ArrayList(this.findAll()) ;
+        Iterator iter = semestrAll.iterator();
+        while(iter.hasNext()){
+            Semestr delete = (Semestr) iter.next();
+            this.remove(delete);
+        }
+    }
 }

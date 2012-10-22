@@ -7,6 +7,8 @@ package entityFacade;
 import dbEntity.DenVTydnu;
 import dbEntity.Mistnost;
 import dbEntity.Rozvrhy;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -41,6 +43,16 @@ public class RozvrhyFacade extends AbstractFacade<Rozvrhy> {
         qr.setParameter("iDdnu", denVTydnu);
         
         return qr.getResultList();
+    }
+    
+    public void removeAll(){
+        
+        ArrayList<Rozvrhy> rozvrhyAll = new ArrayList(this.findAll()) ;
+        Iterator iter = rozvrhyAll.iterator();
+        while(iter.hasNext()){
+            Rozvrhy delete = (Rozvrhy) iter.next();
+            this.remove(delete);
+        }
     }
     
 }

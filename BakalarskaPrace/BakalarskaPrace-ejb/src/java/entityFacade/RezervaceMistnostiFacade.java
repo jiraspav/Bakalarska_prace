@@ -7,7 +7,9 @@ package entityFacade;
 import dbEntity.Mistnost;
 import dbEntity.RezervaceMistnosti;
 import dbEntity.Uzivatel;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -38,15 +40,26 @@ public class RezervaceMistnostiFacade extends AbstractFacade<RezervaceMistnosti>
         
         return qr.getResultList();
     }
+    
     public List<RezervaceMistnosti> getRezervaceByMistnostID(Mistnost mistnost) {
         Query qr = em.createNamedQuery("RezervaceMistnosti.findByIDmistnosti");
         qr.setParameter("iDmistnosti", mistnost);
         return qr.getResultList();
     }
+    
     public List<RezervaceMistnosti> getRezervaceByDatum(Date datum) {
         Query qr = em.createNamedQuery("RezervaceMistnosti.findByDatumRezervace");
         qr.setParameter("datumRezervace", datum);
         return qr.getResultList();
+    }
+    
+    public void removeAll(){
+        ArrayList<RezervaceMistnosti> rezAll = new ArrayList(this.findAll()) ;
+        Iterator iter = rezAll.iterator();
+        while(iter.hasNext()){
+            RezervaceMistnosti delete = (RezervaceMistnosti) iter.next();
+            this.remove(delete);
+        }
     }
 }
 

@@ -6,6 +6,8 @@ package entityFacade;
 
 import dbEntity.Mistnost;
 import dbEntity.Stredisko;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -36,4 +38,14 @@ public class StrediskoFacade extends AbstractFacade<Stredisko> {
         return (Stredisko) query.getSingleResult();
         
     }
+    
+    public void removeAll(){
+        ArrayList<Stredisko> strediskaAll = new ArrayList(this.findAll()) ;
+        Iterator iter = strediskaAll.iterator();
+        while(iter.hasNext()){
+            Stredisko delete = (Stredisko) iter.next();
+            this.remove(delete);
+        }
+    }
+        
 }

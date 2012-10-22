@@ -7,18 +7,15 @@ package beans.admin;
 import XMLparser.ParserController;
 import app.SessionHolder.SessionHolder;
 import app.facesMessenger.FacesMessengerUtil;
-import dbEntity.*;
+import dbEntity.Semestr;
+import dbEntity.UpdateRozvrhu;
 import entityFacade.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Asynchronous;
 import javax.enterprise.context.ConversationScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import view.bundle.ResourceBundleOperator;
@@ -107,7 +104,6 @@ public class AdminPageBean implements Serializable{
         if(ready){
             ready = false;
             
-            
             if(session.getLoggedUzivatel().getLogin().equals("superadmin")){
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgDefaultAdminUpdateDBRestricted"));
             }
@@ -117,7 +113,6 @@ public class AdminPageBean implements Serializable{
                 messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgUpdateComp"));
             }
             
-            
             ready = true;
         }
     }
@@ -126,9 +121,6 @@ public class AdminPageBean implements Serializable{
      */
     @Asynchronous
     public void fillDB(){
-        //System.out.println("Naplňuji databázi...");
-        //if(denFac.findAll().isEmpty())
-        //    fillDny();
         if(strFac.findAll().isEmpty()){
             parsCon.fillDepartments();
         }
@@ -147,54 +139,21 @@ public class AdminPageBean implements Serializable{
      */
     @Asynchronous
     public void deleteDB(){
-        ArrayList<RezervaceMistnosti> rezAll = new ArrayList(rezFac.findAll()) ;
-        Iterator iter = rezAll.iterator();
-        while(iter.hasNext()){
-            RezervaceMistnosti delete = (RezervaceMistnosti) iter.next();
-            rezFac.remove(delete);
-        }
         
-        ArrayList<Rozvrhy> rozvrhyAll = new ArrayList(rozFac.findAll()) ;
-        iter = rozvrhyAll.iterator();
-        while(iter.hasNext()){
-            Rozvrhy delete = (Rozvrhy) iter.next();
-            rozFac.remove(delete);
-        }
+        rezFac.removeAll();
         
-        ArrayList<Predmety> predmetyAll = new ArrayList(predFac.findAll()) ;
-        iter = predmetyAll.iterator();
-        while(iter.hasNext()){
-            Predmety delete = (Predmety) iter.next();
-            predFac.remove(delete);
-        }
+        rozFac.removeAll();
         
-        /*ArrayList<Mistnost> mistnostiAll = new ArrayList(mistFac.findAll()) ;
-        iter = mistnostiAll.iterator();
-        while(iter.hasNext()){
-            Mistnost delete = (Mistnost) iter.next();
-            mistFac.remove(delete);
-        }
+        predFac.removeAll();
         
-        ArrayList<Stredisko> strediskaAll = new ArrayList(strFac.findAll()) ;
-        iter = strediskaAll.iterator();
-        while(iter.hasNext()){
-            Stredisko delete = (Stredisko) iter.next();
-            strFac.remove(delete);
+        /*
+        mistFac.removeAll();
+        strFac.removeAll();
         }*/
         
-        ArrayList<UpdateRozvrhu> updateRozvrhuAll = new ArrayList(upRozFac.findAll()) ;
-        iter = updateRozvrhuAll.iterator();
-        while(iter.hasNext()){
-            UpdateRozvrhu delete = (UpdateRozvrhu) iter.next();
-            upRozFac.remove(delete);
-        }
+        upRozFac.removeAll();
         
-        ArrayList<Semestr> semestrAll = new ArrayList(semFac.findAll()) ;
-        iter = semestrAll.iterator();
-        while(iter.hasNext()){
-            Semestr delete = (Semestr) iter.next();
-            semFac.remove(delete);
-        }
+        semFac.removeAll();
     }
     
     
@@ -216,5 +175,4 @@ public class AdminPageBean implements Serializable{
     public void setConfDialog(String confDialog) {
         this.confDialog = confDialog;
     }
-    
 }
