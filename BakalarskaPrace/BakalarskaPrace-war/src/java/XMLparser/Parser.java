@@ -5,6 +5,7 @@
 package XMLparser;
 
 
+import app.baseDataOperators.*;
 import view.auth.LoginVerifier;
 import dbEntity.*;
 import entityFacade.*;
@@ -46,6 +47,14 @@ public class Parser implements Serializable{
     private @Inject UpdateRozvrhuFacade upRozFac;
     private @Inject LoginVerifier user;
     
+    private @Inject KosApiOperator kosOper;
+    private @Inject RozvrhyOperator rozOper;
+    private @Inject SemestrOperator semOper;
+    private @Inject UpdateRozvrhuOperator upRozOper;
+    private @Inject MistnostOperator misOper;
+    private @Inject StrediskoOperator stredOper;
+    private @Inject PredmetyOperator predOper;
+    
     static String[] converter = {"7:30","9:00","9:15","10:45","11:00","12:30",
                                 "12:45","14:15","14:30","16:00","16:15","17:45","18:00","19:30","20:30"};
     
@@ -68,20 +77,14 @@ public class Parser implements Serializable{
         System.out.println("|            Střediska            |");
         System.out.println("|---------------------------------|");
         
-            URL url = new URL(kosapiUrls.departments);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
+            kosOper.createNewConnection(kosapiUrls.departments, user.getLogin(), user.getPassword());
             
-            String userPassword = user.getLogin()+":"+user.getPassword();  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
-
             NodeList nodeList = null;
             try {
             
                         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                         DocumentBuilder db = dbf.newDocumentBuilder();
-                        Document doc = db.parse(http.getInputStream());
+                        Document doc = db.parse(kosOper.getConnection().getInputStream());
                         doc.getDocumentElement().normalize();
                         //System.out.println("Root element " + doc.getDocumentElement().getNodeName());
                         
@@ -117,13 +120,9 @@ public class Parser implements Serializable{
                                 department = node.getTextContent();
                         }
                         if(!utvs){
-                            Stredisko stredisko = new Stredisko();
                             
-                            stredisko.setIDstredisko(id);
-                            stredisko.setIdentCislo(code);
-                            stredisko.setNazev(department);
-                            
-                            persistDepartment(stredisko);
+                            stredOper.createStredisko(id,code,department);
+
                         }
                         utvs = false;
                     }
@@ -133,12 +132,7 @@ public class Parser implements Serializable{
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
-            http.disconnect();
-    }
-    
-    private void persistDepartment(Stredisko stredisko){
-        System.out.println(stredisko.getNazev());
-        strFac.create(stredisko);
+            kosOper.closeConnection();
     }
     
     /**
@@ -152,18 +146,14 @@ public class Parser implements Serializable{
         System.out.println("|---------------------------------|");
         System.out.println("|            Místnosti            |");
         System.out.println("|---------------------------------|");
-            URL url = new URL(kosapiUrls.rooms);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-            
-            String userPassword = user.getLogin()+":"+user.getPassword();  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
+        
+            kosOper.createNewConnection(kosapiUrls.rooms, user.getLogin(), user.getPassword());
+        
             
            try {     
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db = dbf.newDocumentBuilder();
-                    Document doc = db.parse(http.getInputStream());
+                    Document doc = db.parse(kosOper.getConnection().getInputStream());
                     doc.getDocumentElement().normalize();
                     
                     NodeList nodeList = doc.getElementsByTagName("room");
@@ -191,13 +181,8 @@ public class Parser implements Serializable{
                         
                     }
                     
-                    Mistnost mistnost = new Mistnost();
+                    misOper.createMistnost(id,code,new Stredisko(department));
                     
-                    mistnost.setIDmistnosti(id);
-                    mistnost.setZkratka(code);
-                    mistnost.setIDstrediska(new Stredisko(department));
-                    
-                    this.persistRoom(mistnost);
                 }
                 
         } catch (SAXException ex) {
@@ -205,12 +190,8 @@ public class Parser implements Serializable{
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
-           http.disconnect();
-    }
-    
-    private void persistRoom(Mistnost mistnost){
-        System.out.println(mistnost.getZkratka());
-        mistFac.create(mistnost);
+           
+           kosOper.closeConnection();
     }
     
     /**
@@ -223,18 +204,13 @@ public class Parser implements Serializable{
         System.out.println("|---------------------------------|");
         System.out.println("|            Předměty             |");
         System.out.println("|---------------------------------|");
-            URL url = new URL(kosapiUrls.courses);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-            
-            String userPassword = user.getLogin()+":"+user.getPassword();  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
+        
+        kosOper.createNewConnection(kosapiUrls.courses, user.getLogin(), user.getPassword());
             
            try {     
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db = dbf.newDocumentBuilder();
-                    Document doc = db.parse(http.getInputStream());
+                    Document doc = db.parse(kosOper.getConnection().getInputStream());
                     doc.getDocumentElement().normalize();
                     
                     NodeList nodeList = doc.getElementsByTagName("course");
@@ -261,13 +237,8 @@ public class Parser implements Serializable{
                         
                     }
                     
-                    Predmety predmet = new Predmety();
+                    predOper.createPredmet(id,name,shortName);
                     
-                    predmet.setIDpredmetu(id);
-                    predmet.setNazev(name);
-                    predmet.setZkratka(shortName);
-                    
-                    persistCourse(predmet);
                 }
                 
         } catch (SAXException ex) {
@@ -275,12 +246,7 @@ public class Parser implements Serializable{
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        http.disconnect();
-    }
-
-    private void persistCourse(Predmety predmet) {
-        System.out.println(predmet.getNazev());
-            predFac.create(predmet);
+        kosOper.closeConnection();
     }
 
     /**
@@ -293,21 +259,17 @@ public class Parser implements Serializable{
         System.out.println("|            Rozvrhy              |");
         System.out.println("|---------------------------------|");
          try {
-            URL url = new URL(kosapiUrls.roomsNolevel);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-            
-            String userPassword = user.getLogin()+":"+user.getPassword();  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
+             
+             kosOper.createNewConnection(kosapiUrls.roomsNolevel, user.getLogin(), user.getPassword());
             
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db = dbf.newDocumentBuilder();
-                    Document doc = db.parse(http.getInputStream());
+                    Document doc = db.parse(kosOper.getConnection().getInputStream());
                     doc.getDocumentElement().normalize();
                     
                     NodeList nodeList = doc.getElementsByTagName("room");
-             http.disconnect();   
+                    
+             kosOper.closeConnection();   
                 
                 for(int i = 0; i<nodeList.getLength(); i++){
                     
@@ -316,23 +278,18 @@ public class Parser implements Serializable{
                     
                     String uri = current.getAttribute("uri");
                     Long idMistnosti = Long.parseLong(current.getAttribute("id"));
-                    //System.out.println("---------------------------------------------");
-                    //System.out.println("| Mistnost uri = "+uri+" id = "+id);
-                    
                     
                     
                     //pripojeni ke kosapi pro jednu konkretni mistnost a stazeni vsech paralelek pro danou mistnost
-                    URL adresaParalelky = new URL(uri+"parallels?paging=false&level=1");
-                    HttpsURLConnection httpParalelky = (HttpsURLConnection) adresaParalelky.openConnection();
-
-                    //zakodovani dat do BASE64
-                    httpParalelky.setRequestProperty("Authorization", "Basic "+encoding);
-            
+                    kosOper.createNewConnection(uri+"parallels?paging=false&level=1", user.getLogin(), user.getPassword());
+                    
                     DocumentBuilderFactory dbf2 = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db2 = dbf2.newDocumentBuilder();
-                    Document doc2 = db2.parse(httpParalelky.getInputStream());
+                    Document doc2 = db2.parse(kosOper.getConnection().getInputStream());
                     doc2.getDocumentElement().normalize();
-                    httpParalelky.disconnect();
+                    
+                    kosOper.closeConnection();
+                    
                     NodeList nodeList2 = doc2.getElementsByTagName("parallel");
                     //System.out.println("| Adresa = "+uri+"parallels?paging=false&level=1");
                     //System.out.println("| Pocet paralelek = "+nodeList2.getLength());
@@ -369,27 +326,18 @@ public class Parser implements Serializable{
                                     parita = node.getTextContent();
 
                             }
-                        //  System.out.println("| Vyuka predmetu "+idParalelky+" v "+den+" od "+od+" do "+do1+" parity "+parita);
-
-
-
-
-
-
-
+                        
 
                             //zjisteni id predmetu
-                            URL adresaPredmetu = new URL(urlPredmetu);
-                            HttpsURLConnection httpPredmetu = (HttpsURLConnection) adresaPredmetu.openConnection();
-
-                            //zakodovani dat do BASE64
-                            httpPredmetu.setRequestProperty("Authorization", "Basic "+encoding);
+                            
+                            kosOper.createNewConnection(urlPredmetu, user.getLogin(), user.getPassword());
 
                             DocumentBuilderFactory dbf3 = DocumentBuilderFactory.newInstance();
                             DocumentBuilder db3 = dbf3.newDocumentBuilder();
-                            Document doc3 = db3.parse(httpPredmetu.getInputStream());
+                            Document doc3 = db3.parse(kosOper.getConnection().getInputStream());
                             doc3.getDocumentElement().normalize();
-                            httpPredmetu.disconnect();
+                            
+                            kosOper.closeConnection();
 
                             NodeList nodeList3 = doc3.getElementsByTagName("course");
                             Long idPredmetu = Long.parseLong(((Element)nodeList3.item(0)).getAttribute("id"));
@@ -406,37 +354,25 @@ public class Parser implements Serializable{
                                 Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
-
-                            Rozvrhy rozvrh = new Rozvrhy();
-                            rozvrh.setIDrozvrhu(new Long(1));
-                            rozvrh.setIDdnu(denFac.getDenByNazev(den));
-                            rozvrh.setIDmistnosti(new Mistnost(idMistnosti));
-                            rozvrh.setIDpredmetu(new Predmety(idPredmetu));
-                            rozvrh.setDo1(doDate);
-                            rozvrh.setOd(odDate);
-
+                            boolean lichy,sudy;
+                            
                             if(parita.equals("BOTH")){
-                                rozvrh.setLichyTyden(true);
-                                rozvrh.setSudyTyden(true);
+                                lichy = true;
+                                sudy = true;
                             }
                             else if(parita.equals("ODD")){
-                                rozvrh.setLichyTyden(true);
-                                rozvrh.setSudyTyden(false);
+                                lichy = true;
+                                sudy = false;
                             }
                             else {
-                                rozvrh.setLichyTyden(false);
-                                rozvrh.setSudyTyden(true);
+                                lichy = false;
+                                sudy = true;
                             }
-
-                            persistRozvrh(rozvrh);
-
-
-
-
+                            
+                            rozOper.createRozvrh(new Long(1),denFac.getDenByNazev(den),new Mistnost(idMistnosti),
+                                            new Predmety(idPredmetu),doDate,odDate,lichy,sudy);
+                            
                         }
-                    
-                    
-                    
                     
                     //System.out.println("---------------------------------------------");
                     }
@@ -451,10 +387,6 @@ public class Parser implements Serializable{
          
     }
 
-    private void persistRozvrh(Rozvrhy rozvrh) {
-        System.out.println(rozvrh.getIDpredmetu().getZkratka()+" "+rozvrh.getOd()+"-"+rozvrh.getDo1());
-        this.rozFac.create(rozvrh);
-    }
     
     /**
      * Načte data o aktuálním rozvrhu z KosAPI a plní s nimi databázi.
@@ -464,19 +396,15 @@ public class Parser implements Serializable{
     public void setSemestr() throws IOException{
     
         try {
-            URL url = new URL(kosapiUrls.currentSemestr);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-
-            String userPassword = user.getLogin()+":"+user.getPassword();  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
+            kosOper.createNewConnection(kosapiUrls.currentSemestr, user.getLogin(), user.getPassword());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(http.getInputStream());
+            Document doc = db.parse(kosOper.getConnection().getInputStream());
             doc.getDocumentElement().normalize();
-            http.disconnect();
+            
+            kosOper.closeConnection();
+            
             NodeList semestr = doc.getElementsByTagName("semester");
             Integer idSemestru = Integer.parseInt(((Element)semestr.item(0)).getAttribute("id"));
             
@@ -507,20 +435,10 @@ public class Parser implements Serializable{
                 Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            Semestr current = new Semestr();
-            current.setIDsemestru(idSemestru);
-            current.setKod(code);
-            current.setZacina(zacatek);
-            current.setKonci(konec);
+            Semestr current = semOper.createSemestr(idSemestru,code,zacatek,konec);
             
-            this.persistSemestr(current);
+            upRozOper.createUpdateRozvrhu(new Integer(1),current,new Date());
             
-            UpdateRozvrhu update = new UpdateRozvrhu();
-            update.setIDupdaterozvrhu(new Integer(1));
-            update.setIDsemestru(current);
-            update.setDatumAktualizaceRozvrhu(new Date());
-            
-            this.persistUpdateRozvrhu(update);
         } catch (SAXException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
@@ -531,12 +449,6 @@ public class Parser implements Serializable{
         }
         
         
-    }
-    private void persistSemestr(Semestr semestr){
-        this.semFac.create(semestr);
-    }
-    private void persistUpdateRozvrhu(UpdateRozvrhu update){
-        this.upRozFac.create(update);
     }
     
     
@@ -556,19 +468,14 @@ public class Parser implements Serializable{
     public List<String> getAtributes(String login, String mujLogin, String mojeHeslo) {
         ArrayList<String> seznamAtributu = new ArrayList<String>();
         try {
-            URL url = new URL(kosapiUrls.people+"/"+login);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-            //System.out.println(mujLogin+":"+mojeHeslo);
-            String userPassword = mujLogin+":"+mojeHeslo;  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
-
+            kosOper.createNewConnection(kosapiUrls.people+"/"+login, mujLogin, mojeHeslo);
+            
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(http.getInputStream());
+            Document doc = db.parse(kosOper.getConnection().getInputStream());
             doc.getDocumentElement().normalize();
-            http.disconnect();
+            
+            kosOper.closeConnection();
             
             NodeList person = doc.getElementsByTagName("person");
             NodeList teacher = doc.getElementsByTagName("teacher");
@@ -588,14 +495,12 @@ public class Parser implements Serializable{
             String fullName = jmeno+" "+prijmeni;
             String idUzivatele = ((Element)person.item(0)).getAttribute("id");
             String role;
-            if(teacher.getLength() > 0)
+            if(teacher.getLength() > 0){
                 role = "ucitel";
-            else
+            }
+            else{
                 role = "student";
-            
-            
-            
-            
+            }
             
             seznamAtributu.add(fullName);
             seznamAtributu.add(idUzivatele);
@@ -611,8 +516,6 @@ public class Parser implements Serializable{
         }
         return seznamAtributu;
     }
-
-    
 }
 
     
