@@ -27,6 +27,8 @@ public class MistnostOperator {
         
         System.out.println("Mistnost "+mistnost.getZkratka());
         
+        misFac.create(mistnost);
+        
         return mistnost;
     }
     

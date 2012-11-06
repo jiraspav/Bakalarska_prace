@@ -25,13 +25,13 @@ public class KosApiOperator {
     public void createNewConnection(String address, String login, String pass){
         
         try {
-        URL url = new URL(address);
-        currConn = (HttpsURLConnection) url.openConnection();
-            
-        String userPassword = login+":"+pass;  
-        //zakodovani dat do BASE64
-        String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-        currConn.setRequestProperty("Authorization", "Basic "+encoding);
+            URL url = new URL(address);
+            currConn = (HttpsURLConnection) url.openConnection();
+
+            String userPassword = login+":"+pass;  
+            //zakodovani dat do BASE64
+            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+            currConn.setRequestProperty("Authorization", "Basic "+encoding);
         
         
         } catch (IOException ex) {

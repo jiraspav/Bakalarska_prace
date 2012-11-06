@@ -31,9 +31,9 @@ public class RozvrhyOperator {
         rozvrh.setIDmistnosti(mistnost);
         rozvrh.setIDpredmetu(predmety);
         
-        rozFac.create(rozvrh);
-        
         System.out.println(rozvrh.getIDpredmetu().getZkratka()+" "+rozvrh.getOd()+"-"+rozvrh.getDo1());
+        
+        rozFac.create(rozvrh);
         
         return rozvrh;
     }

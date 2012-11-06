@@ -40,11 +40,11 @@ public class DataCreator {
     }
     
     private void buildDny(){
-        dnyOperator.buildDefault();
+        dnyOperator.buildDefaultDny();
     }
 
     private void buildDefaultAdmin() {
-        uzivOperator.buildDefault();
+        uzivOperator.buildDefaultUzivatel();
     }
     
     

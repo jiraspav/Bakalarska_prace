@@ -5,7 +5,7 @@
 package beans.admin;
 
 import XMLparser.ParserController;
-import view.sessionHolder.SessionHolder;
+import app.sessionHolder.SessionHolder;
 import app.facesMessenger.FacesMessengerUtil;
 import dbEntity.Semestr;
 import dbEntity.UpdateRozvrhu;

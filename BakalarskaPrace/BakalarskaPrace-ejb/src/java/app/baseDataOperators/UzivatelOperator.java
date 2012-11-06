@@ -29,12 +29,14 @@ public class UzivatelOperator {
         Uzivatel uziv = new Uzivatel(id, login, name);
         uziv.setHeslo(crypt.SHA256(password));
         
+        System.out.println("Uzivatel "+uziv.getJmeno());
+        
         uzivFac.create(uziv);
 
         return uziv;
     }
     
-    public void buildDefault(){
+    public void buildDefaultUzivatel(){
         
         createUzivatel(1, "superadmin", crypt.SHA256("admin"), "Default administrátor");
 

@@ -5,7 +5,8 @@
 package view.auth;
 
 import XMLparser.ParserController;
-import XMLparser.kosapiUrls;
+import app.XMLparser.kosapiUrls;
+import app.baseDataOperators.KosApiOperator;
 import app.baseDataOperators.UzivatelOperator;
 import dbEntity.GroupTable;
 import dbEntity.Uzivatel;
@@ -49,6 +50,7 @@ public class LoginVerifier implements Serializable{
     private @Inject UzivatelFacade uzivFac;
     private @Inject FacesMessengerUtil faceUtil;
     private @Inject ResourceBundleOperator bundle;
+    private @Inject KosApiOperator kosOper;
     
     private String login,password,role;
     private String regLogin,regPassword;
@@ -113,15 +115,11 @@ public class LoginVerifier implements Serializable{
     public boolean isValid(){
         int serverResponse = 0;
         try {
-            URL url = new URL(kosapiUrls.validation);
-            HttpsURLConnection http = (HttpsURLConnection) url.openConnection();
-
-            String userPassword = regLogin+":"+regPassword;  
-            //zakodovani dat do BASE64
-            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-            http.setRequestProperty("Authorization", "Basic "+encoding);
-            serverResponse = http.getResponseCode();
-            http.disconnect();
+            kosOper.createNewConnection(kosapiUrls.validation, regLogin, regPassword);
+            
+            serverResponse = kosOper.getConnection().getResponseCode();
+            
+            kosOper.closeConnection();
         } catch (IOException ex) {
             Logger.getLogger(LoginVerifier.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,21 +131,17 @@ public class LoginVerifier implements Serializable{
         }
     }
     
-    
     /**
      * Metoda zajišťující registraci a kontrolu nového uživatele, zda je registrován na FELu
      * a zda má přístup do KOSu
      */
     public void register(){
         Uzivatel uziv = uzivFac.getUserByLogin(regLogin);
-        //System.out.println("Uzivatel "+uziv);
-        //System.out.println("isValid() "+isValid());
+        
             if(uziv == null && isValid()){
                 ArrayList<String> atributy = (ArrayList<String>) parsCon.getAtributes(regLogin,regLogin,regPassword);
                 
-                
                 uzivOperator.createUzivatel(Long.parseLong(atributy.get(1)), regLogin, encrypt.SHA256(regPassword), atributy.get(0));
-                
 
                 GroupTable groupTab;
                 

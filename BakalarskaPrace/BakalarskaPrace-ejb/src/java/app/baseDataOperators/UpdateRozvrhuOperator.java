@@ -26,9 +26,9 @@ public class UpdateRozvrhuOperator {
         UpdateRozvrhu update = new UpdateRozvrhu(integer, date);
         update.setIDsemestru(current);
         
-        updateFac.create(update);
-        
         System.out.println("UpdateRozvrhu "+update.toString());
+        
+        updateFac.create(update);
         
         return update;
         

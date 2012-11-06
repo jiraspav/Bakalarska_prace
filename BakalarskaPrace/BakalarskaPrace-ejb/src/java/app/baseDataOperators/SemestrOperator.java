@@ -23,9 +23,9 @@ public class SemestrOperator {
         
         Semestr semestr = new Semestr(idSemestru, code, zacatek, konec);
         
-        semFac.create(semestr);
-        
         System.out.println("Semestr "+semestr.toString());
+        
+        semFac.create(semestr);
         
         return semestr;
                 

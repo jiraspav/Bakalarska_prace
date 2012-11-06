@@ -21,7 +21,7 @@ public class DnyVTydnuOperator {
     
     private @Inject DenVTydnuFacade denFac;
     
-    public void buildDefault(){
+    public void buildDefaultDny(){
         DenVTydnu den = new DenVTydnu(new Integer(1), "Pondělí");
         denFac.create(den);
             den = new DenVTydnu(new Integer(2), "Úterý");

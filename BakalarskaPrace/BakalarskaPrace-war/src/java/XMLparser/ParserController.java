@@ -5,6 +5,7 @@
 package XMLparser;
 
 
+import app.XMLparser.Parser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
