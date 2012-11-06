@@ -30,6 +30,7 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import view.SessionHolder.SessionHolderMB;
 
 /**
  *
@@ -39,6 +40,7 @@ import org.primefaces.model.ScheduleModel;
 @SessionScoped
 public class scheduleMistnostiController implements Serializable {
 
+    @Inject SessionHolderMB session;
     @Inject LoginVerifier user;
     @Inject UzivatelFacade uzivFac;
     @Inject DenVTydnuFacade denFac;
@@ -115,7 +117,7 @@ public class scheduleMistnostiController implements Serializable {
                 //System.out.println(vytBean.getSelectedNode()+" --- "+vytBean.getRoot());
                 RezervaceMistnosti nova = new RezervaceMistnosti(new Integer(10), getEvent().getStartDate(), casOd, casDo, naCelouMistnost, popis);
                 Mistnost mistnost = misFac.findMistnostPodleZkratky((String)vytBean.getSelectedNode().getData().toString());
-                Uzivatel uziv = uzivFac.getUserByLogin(user.getLogin());
+                Uzivatel uziv = uzivFac.getUserByLogin(session.getLoggedUzivatelLogin());
 
                 SimpleDateFormat sdf = new SimpleDateFormat("EEEE",Locale.ENGLISH);
 
@@ -140,7 +142,7 @@ public class scheduleMistnostiController implements Serializable {
                     RezervaceMistnosti rez = (RezervaceMistnosti) iter.next();
                     if(getEvent().getStartDate().equals(rez.getDatumRezervace()))
                     if(!((casOd.after(rez.getDo1())) || (casDo.before(rez.getOd())))){
-                        if(rez.getNaCelouMistnost() && (user.getRolePriority(groupFac.getGroup(rez.getIDuser())) >= user.getRolePriority(groupFac.getGroup(uzivFac.getUserByLogin(user.getLogin())))) ){
+                        if(rez.getNaCelouMistnost() && (user.getRolePriority(groupFac.getGroup(rez.getIDuser())) >= user.getRolePriority(groupFac.getGroup(uzivFac.getUserByLogin(session.getLoggedUzivatelLogin())))) ){
                             ok = false;
                             rezervaceCheck = true;
                         }

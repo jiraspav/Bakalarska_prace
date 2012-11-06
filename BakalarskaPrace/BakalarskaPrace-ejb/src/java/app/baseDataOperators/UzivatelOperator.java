@@ -46,4 +46,12 @@ public class UzivatelOperator {
 
         groupFac.create(groupTab);
     }
+    
+    public Uzivatel getUzivatel(Uzivatel uziv){
+        return uzivFac.find(uziv);
+    }
+    
+    public Uzivatel getUzivatel(String name){
+        return uzivFac.getUserByLogin(name);
+    }
 }

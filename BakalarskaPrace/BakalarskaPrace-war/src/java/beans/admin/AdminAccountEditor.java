@@ -4,25 +4,26 @@
  */
 package beans.admin;
 
-import app.DataCreator.DataCreator;
-import XMLparser.ParserController;
-import view.bundle.ResourceBundleOperator;
+import app.XMLparser.ParserController;
 import app.encrypt.EncryptUtil;
-import app.facesMessenger.FacesMessengerUtil;
-import view.auth.LoginVerifier;
-import dbEntity.*;
-import entityFacade.*;
+import dbEntity.GroupTable;
+import dbEntity.GrouptablePK;
+import dbEntity.RezervaceMistnosti;
+import dbEntity.Uzivatel;
+import entityFacade.GroupTableFacade;
+import entityFacade.RezervaceMistnostiFacade;
+import entityFacade.UzivatelFacade;
 import java.io.Serializable;
-import java.util.*;
-import javax.ejb.Asynchronous;
+import java.util.List;
+import java.util.Random;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.primefaces.component.datatable.DataTable;
+import view.SessionHolder.SessionHolderMB;
+import view.bundle.ResourceBundleOperator;
+import view.facesMessenger.FacesMessengerUtil;
 
 /**
  *
@@ -35,16 +36,8 @@ import org.primefaces.component.datatable.DataTable;
 public class AdminAccountEditor implements Serializable{
     
     private @Inject RezervaceMistnostiFacade rezFac;
-    private @Inject MistnostFacade mistFac;
-    private @Inject StrediskoFacade strFac;
-    private @Inject PredmetyFacade predFac;
-    private @Inject SemestrFacade semFac;
-    private @Inject RozvrhyFacade rozFac;
-    private @Inject UpdateRozvrhuFacade upRozFac;
     
-    private @Inject DenVTydnuFacade denFac;
-    
-    private @Inject LoginVerifier user;
+    private @Inject SessionHolderMB session;
     private @Inject ParserController parsCon;
     private @Inject UzivatelFacade uzivFac;
     private @Inject GroupTableFacade groupFac;
@@ -118,7 +111,7 @@ public class AdminAccountEditor implements Serializable{
      */
     public void odeberAdminRoli(){
         if(selectedRow != null){
-            if(selectedRow.getLogin().equals(user.getLogin())){
+            if(selectedRow.getLogin().equals(session.getLoggedUzivatel().getLogin())){
                 messUtil.addFacesMsgError("Sám sobě nemůžete odebírat roli administrátora.");
             }
             else if(groupFac.getGroup(selectedRow).equals("admin")){
@@ -127,7 +120,7 @@ public class AdminAccountEditor implements Serializable{
                     role = "guest";
                 }
                 else{
-                List<String> atributy = parsCon.getAtributes(selectedRow.getLogin(),user.getLogin(),user.getPassword());
+                List<String> atributy = parsCon.getAtributes(selectedRow.getLogin(),session.getLoggedUzivatel().getLogin(),session.getPassword());
                  role = atributy.get(2);
                 }
                 GroupTable group = groupFac.getGroupTableByUziv(selectedRow);

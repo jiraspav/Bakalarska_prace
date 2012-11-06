@@ -4,6 +4,7 @@
  */
 package beans.mistnosti;
 
+import app.baseDataOperators.UzivatelOperator;
 import view.auth.LoginVerifier;
 import dbEntity.*;
 import entityFacade.*;
@@ -25,6 +26,7 @@ import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.model.DefaultScheduleEvent;
+import view.SessionHolder.SessionHolderMB;
 /**
  *
  * @author Pavel
@@ -35,7 +37,8 @@ public class MojeRezervaceBean implements Serializable{
 
     private DataModel items;
     @Inject LoginVerifier userBean;
-    @Inject UzivatelFacade userCon;
+    @Inject UzivatelOperator userCon;
+    @Inject SessionHolderMB session;
     @Inject RezervaceMistnostiFacade rezFac;
     @Inject MistnostFacade misFac;
     @Inject UzivatelFacade uzivFac;
@@ -62,7 +65,7 @@ public class MojeRezervaceBean implements Serializable{
      */
     public DataModel getItems(){
         
-        Uzivatel user = getUserCon().getUserByLogin(getUserBean().getLogin());
+        Uzivatel user = session.getLoggedUzivatel();
         items = new ListDataModel(getRezFac().getRezervaceByUserID(user)) ;
         return items;
     }
@@ -109,7 +112,7 @@ public class MojeRezervaceBean implements Serializable{
                         RezervaceMistnosti rez = (RezervaceMistnosti) iter.next();
                         if(dateDatumRezervace.equals(rez.getDatumRezervace()))
                         if(!((dateOd.after(rez.getDo1())) || (dateDo1.before(rez.getOd())))){
-                            if(rez.getNaCelouMistnost() && (userBean.getRolePriority(groupFac.getGroup(rez.getIDuser())) >= userBean.getRolePriority(groupFac.getGroup(uzivFac.getUserByLogin(userBean.getLogin())))) ){
+                            if(rez.getNaCelouMistnost() && (userBean.getRolePriority(groupFac.getGroup(rez.getIDuser())) >= userBean.getRolePriority(groupFac.getGroup(uzivFac.getUserByLogin(session.getLoggedUzivatel().getLogin())))) ){
                                 ok = false;
                                 rezervaceCheck = true;
                             }
@@ -218,20 +221,6 @@ public class MojeRezervaceBean implements Serializable{
      */
     public void setUserBean(LoginVerifier userBean) {
         this.userBean = userBean;
-    }
-
-    /**
-     * @return the userCon
-     */
-    public UzivatelFacade getUserCon() {
-        return userCon;
-    }
-
-    /**
-     * @param userCon the userCon to set
-     */
-    public void setUserCon(UzivatelFacade userCon) {
-        this.userCon = userCon;
     }
 
     /**

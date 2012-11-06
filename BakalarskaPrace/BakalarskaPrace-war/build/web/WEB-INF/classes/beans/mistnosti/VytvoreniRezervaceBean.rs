@@ -1,2 +1,0 @@
-beans.mistnosti.StrediskoComparator
-beans.mistnosti.VytvoreniRezervaceBean

@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import view.SessionHolder.SessionHolderMB;
 
 /**
  *
@@ -44,8 +45,9 @@ public class VytvoreniRezervaceBean implements Serializable{
     @Inject StrediskoFacade stredFac;
     @Inject MistnostFacade mistFac;
     @Inject RezervaceMistnostiFacade rezFac;
-    @Inject LoginVerifier user;
     @Inject UzivatelFacade userFac;
+    @Inject SessionHolderMB session;
+    
     private TreeNode selectedNode;  
     private TreeNode root;  
     
@@ -71,7 +73,7 @@ public class VytvoreniRezervaceBean implements Serializable{
      * @return vrací uživatelské jméno
      */
     public String getUzivatelName(){
-        return user.getLogin();
+        return session.getLoggedUzivatel().getLogin();
     }
     
     
@@ -196,7 +198,7 @@ public class VytvoreniRezervaceBean implements Serializable{
             Date od = sdf.parse(odHodiny+":"+odMinuty);
             Date do1 = sdf.parse(doHodiny+":"+doMinuty);
             Date datum ;
-            Uzivatel uziv = userFac.getUserByLogin(user.getLogin());
+            Uzivatel uziv = userFac.getUserByLogin(session.getLoggedUzivatelLogin());
             if(datumRezervace != null && uziv != null){
                 datum = datumRezervace;
              

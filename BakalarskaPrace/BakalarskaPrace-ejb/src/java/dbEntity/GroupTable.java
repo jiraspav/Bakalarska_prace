@@ -42,8 +42,9 @@ public class GroupTable implements Serializable {
 
     public GroupTable(String username, String groupid) {
         this.grouptablePK = new GrouptablePK(username, groupid);
+        this.login = username;
     }
-
+    
     public GrouptablePK getGrouptablePK() {
         return grouptablePK;
     }

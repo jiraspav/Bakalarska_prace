@@ -4,9 +4,9 @@
  */
 package beans.admin;
 
-import XMLparser.ParserController;
-import app.sessionHolder.SessionHolder;
-import app.facesMessenger.FacesMessengerUtil;
+import app.XMLparser.ParserController;
+import view.SessionHolder.SessionHolderMB;
+import view.facesMessenger.FacesMessengerUtil;
 import dbEntity.Semestr;
 import dbEntity.UpdateRozvrhu;
 import entityFacade.*;
@@ -38,7 +38,7 @@ public class AdminPageBean implements Serializable{
     private @Inject ParserController parsCon;
     private @Inject FacesMessengerUtil messUtil;
     private @Inject ResourceBundleOperator bundle;
-    private @Inject SessionHolder session;
+    private @Inject SessionHolderMB session;
     private @Inject GroupTableFacade groupFac;
     
     private String confDialog;

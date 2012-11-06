@@ -6,7 +6,7 @@ package app.XMLparser;
 
 
 import app.baseDataOperators.*;
-import app.sessionHolder.SessionHolder;
+import app.sessionHolder.SessionHolderEJB;
 import dbEntity.*;
 import entityFacade.*;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 public class Parser implements Serializable{
 
     private @Inject DenVTydnuFacade denFac;
-    private @Inject SessionHolder session;
+    private @Inject SessionHolderEJB session;
     
     private @Inject KosApiOperator kosOper;
     private @Inject RozvrhyOperator rozOper;
