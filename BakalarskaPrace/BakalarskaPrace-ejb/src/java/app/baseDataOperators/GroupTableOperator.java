@@ -5,7 +5,9 @@
 package app.baseDataOperators;
 
 import dbEntity.GroupTable;
+import dbEntity.Uzivatel;
 import entityFacade.GroupTableFacade;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -25,6 +27,24 @@ public class GroupTableOperator {
         groupFac.create(groupTable);
         
         return groupTable;
+    }
+    
+    
+    public List<GroupTable> getAllWithOneRole(String role){
+        return groupFac.getGroupTableByRole(role);
+    }
+    public GroupTable getGroupTable(Uzivatel uziv){
+        return groupFac.getGroupTableByUziv(uziv);
+    }
+    public GroupTable getGroupTable(String login){
+        return groupFac.getGroupTableByUziv(login);
+    }
+    public GroupTable getGroupTable(GroupTable gTable){
+        return groupFac.find(gTable);
+    }
+    
+    public void delete(GroupTable gTable){
+        groupFac.remove(gTable);
     }
     
 }

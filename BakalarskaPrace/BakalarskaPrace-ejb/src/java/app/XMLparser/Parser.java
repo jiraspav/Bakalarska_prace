@@ -73,11 +73,11 @@ public class Parser implements Serializable{
         System.out.println("|            Střediska            |");
         System.out.println("|---------------------------------|");
         
-            kosOper.createNewConnection(kosapiUrls.departments, session.getLoggedUzivatel().getLogin(), session.getPassword());
+            HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.departments, session.getLoggedUzivatel().getLogin(), session.getPassword());
             
             NodeList nodeList = null;
 
-                    Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                    Document doc = documentOper.getNewDocument(conn.getInputStream());
 
                     nodeList = doc.getElementsByTagName("department");
                         
@@ -118,7 +118,7 @@ public class Parser implements Serializable{
                         utvs = false;
                     }
                 
-            kosOper.closeConnection();
+            kosOper.closeConnection(conn);
     }
     
     /**
@@ -133,9 +133,9 @@ public class Parser implements Serializable{
         System.out.println("|            Místnosti            |");
         System.out.println("|---------------------------------|");
         
-            kosOper.createNewConnection(kosapiUrls.rooms, session.getLoggedUzivatel().getLogin(), session.getPassword());
+            HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.rooms, session.getLoggedUzivatel().getLogin(), session.getPassword());
         
-                    Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                    Document doc = documentOper.getNewDocument(conn.getInputStream());
                     
                     NodeList nodeList = doc.getElementsByTagName("room");
                 
@@ -166,7 +166,7 @@ public class Parser implements Serializable{
                     
                 }
                 
-           kosOper.closeConnection();
+           kosOper.closeConnection(conn);
     }
     
     /**
@@ -180,9 +180,9 @@ public class Parser implements Serializable{
         System.out.println("|            Předměty             |");
         System.out.println("|---------------------------------|");
         
-        kosOper.createNewConnection(kosapiUrls.courses, session.getLoggedUzivatel().getLogin(), session.getPassword());
+        HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.courses, session.getLoggedUzivatel().getLogin(), session.getPassword());
             
-                    Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                    Document doc = documentOper.getNewDocument(conn.getInputStream());
                     
                     NodeList nodeList = doc.getElementsByTagName("course");
                 
@@ -212,7 +212,7 @@ public class Parser implements Serializable{
                     
                 }
                 
-        kosOper.closeConnection();
+        kosOper.closeConnection(conn);
     }
 
     /**
@@ -225,13 +225,13 @@ public class Parser implements Serializable{
         System.out.println("|            Rozvrhy              |");
         System.out.println("|---------------------------------|");
              
-             kosOper.createNewConnection(kosapiUrls.roomsNolevel, session.getLoggedUzivatel().getLogin(), session.getPassword());
+             HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.roomsNolevel, session.getLoggedUzivatel().getLogin(), session.getPassword());
             
-                    Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                    Document doc = documentOper.getNewDocument(conn.getInputStream());
                     
                     NodeList nodeList = doc.getElementsByTagName("room");
                     
-             kosOper.closeConnection();   
+             kosOper.closeConnection(conn);   
                 
                 for(int i = 0; i<nodeList.getLength(); i++){
                     
@@ -243,11 +243,11 @@ public class Parser implements Serializable{
                     
                     
                     //pripojeni ke kosapi pro jednu konkretni mistnost a stazeni vsech paralelek pro danou mistnost
-                    kosOper.createNewConnection(uri+"parallels?paging=false&level=1", session.getLoggedUzivatel().getLogin(), session.getPassword());
+                    conn = kosOper.createNewConnection(uri+"parallels?paging=false&level=1", session.getLoggedUzivatel().getLogin(), session.getPassword());
                     
-                        Document doc2 = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                        Document doc2 = documentOper.getNewDocument(conn.getInputStream());
                     
-                    kosOper.closeConnection();
+                    kosOper.closeConnection(conn);
                     
                     NodeList nodeList2 = doc2.getElementsByTagName("parallel");
                     //System.out.println("| Adresa = "+uri+"parallels?paging=false&level=1");
@@ -289,11 +289,11 @@ public class Parser implements Serializable{
 
                             //zjisteni id predmetu
                             
-                            kosOper.createNewConnection(urlPredmetu, session.getLoggedUzivatel().getLogin(), session.getPassword());
+                            conn = kosOper.createNewConnection(urlPredmetu, session.getLoggedUzivatel().getLogin(), session.getPassword());
 
-                                Document doc3 = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                                Document doc3 = documentOper.getNewDocument(conn.getInputStream());
                             
-                            kosOper.closeConnection();
+                            kosOper.closeConnection(conn);
 
                             NodeList nodeList3 = doc3.getElementsByTagName("course");
                             Long idPredmetu = Long.parseLong(((Element)nodeList3.item(0)).getAttribute("id"));
@@ -343,11 +343,11 @@ public class Parser implements Serializable{
      */
     public void setSemestr() throws IOException{
     
-            kosOper.createNewConnection(kosapiUrls.currentSemestr, session.getLoggedUzivatel().getLogin(), session.getPassword());
+            HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.currentSemestr, session.getLoggedUzivatel().getLogin(), session.getPassword());
 
-                Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                Document doc = documentOper.getNewDocument(conn.getInputStream());
             
-            kosOper.closeConnection();
+            kosOper.closeConnection(conn);
             
             NodeList semestr = doc.getElementsByTagName("semester");
             Integer idSemestru = Integer.parseInt(((Element)semestr.item(0)).getAttribute("id"));
@@ -402,11 +402,11 @@ public class Parser implements Serializable{
     public List<String> getAtributes(String login, String mujLogin, String mojeHeslo) throws IOException {
         ArrayList<String> seznamAtributu = new ArrayList<String>();
         
-            kosOper.createNewConnection(kosapiUrls.people+"/"+login, mujLogin, mojeHeslo);
+            HttpsURLConnection conn = kosOper.createNewConnection(kosapiUrls.people+"/"+login, mujLogin, mojeHeslo);
             
-                Document doc = documentOper.getNewDocument(kosOper.getConnection().getInputStream());
+                Document doc = documentOper.getNewDocument(conn.getInputStream());
             
-            kosOper.closeConnection();
+            kosOper.closeConnection(conn);
             
             NodeList person = doc.getElementsByTagName("person");
             NodeList teacher = doc.getElementsByTagName("teacher");

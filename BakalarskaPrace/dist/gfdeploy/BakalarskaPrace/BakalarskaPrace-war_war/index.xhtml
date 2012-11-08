@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    
+
+    <ui:composition template="templateIndex.xhtml">
+        <ui:define name="content">
+            
+            <h:form id="loginFrm">
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="login" value="Login : "/>
+                    <p:inputText id="login" value="#{LoginVerifier.login}"/>
+                    <p:message id="msgLogin" for="login"/>
+                    
+                    <h:outputLabel for="password" value="Heslo : "/>
+                    <p:password id="password" value="#{LoginVerifier.password}"/>
+                    <p:message id="msgPassword" for="password"/>
+                    
+                    <p:commandButton action="#{LoginVerifier.login()}" value="Přihlásit" ajax="false" process="@parent"/>
+                    <p:commandButton value="Registrace" onclick="eventDialog.show()"/>
+                </h:panelGrid>
+            </h:form>  
+                
+            <p:dialog widgetVar="eventDialog" header="Registrace nového uživatele" showEffect="clip" hideEffect="clip" modal="true">  
+                    <h:form>
+                        <h:outputText value="Je nutné zadat platný login a hlavní přístupové heslo."/>
+                        <p:messages id="regMsgs" showDetail="true"/>
+                            <h:panelGrid id="eventDetails" columns="2">  
+                                <h:outputLabel for="regLog" value="Login: "/>
+                                <p:inputText id="regLog" value="#{LoginVerifier.regLogin}"/>
+                                <h:outputLabel for="regPass" value="Heslo: " />  
+                                <p:password id="regPass" value="#{LoginVerifier.regPassword}"/>
+                                <p:commandButton value="Registrovat" actionListener="#{LoginVerifier.register}" update="regMsgs" process="@parent" />  
+                            </h:panelGrid>
+                    </h:form>
+                    
+                          
+                    </p:dialog>
+                
+                
+                
+                
+                
+                
+                
+                
+            
+            
+            
+           
+        </ui:define>
+    </ui:composition>           
+
+</html>

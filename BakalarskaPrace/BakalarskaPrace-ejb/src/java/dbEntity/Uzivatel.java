@@ -46,6 +46,7 @@ public class Uzivatel implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "jmeno")
     private String jmeno;
+    
 //    @JoinColumn(name = "ID_role", referencedColumnName = "ID_role")
 //    @ManyToOne(optional = false)
 //    private Role iDrole;
@@ -67,7 +68,7 @@ public class Uzivatel implements Serializable {
         this.login = login;
         this.jmeno = jmeno;
     }
-
+    
     public Long getIDuser() {
         return iDuser;
     }
@@ -92,14 +93,6 @@ public class Uzivatel implements Serializable {
         this.jmeno = jmeno;
     }
 
-//    public Role getIDrole() {
-//        return iDrole;
-//    }
-//
-//    public void setIDrole(Role iDrole) {
-//        this.iDrole = iDrole;
-//    }
-//
     
     
     
@@ -142,5 +135,5 @@ public class Uzivatel implements Serializable {
     public void setHeslo(String heslo) {
         this.heslo = heslo;
     }
-    
+
 }

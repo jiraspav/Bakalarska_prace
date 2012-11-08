@@ -5,25 +5,21 @@
 package app.baseDataOperators;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Remove;
-import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
  *
  * @author Pavel
  */
-@Stateful
+@Stateless
 public class KosApiOperator {
     
-    private HttpsURLConnection currConn;
-    
-    public void createNewConnection(String address, String login, String pass){
-        
+    public HttpsURLConnection createNewConnection(String address, String login, String pass){
+        HttpsURLConnection currConn = null;
         try {
             URL url = new URL(address);
             currConn = (HttpsURLConnection) url.openConnection();
@@ -37,16 +33,10 @@ public class KosApiOperator {
         } catch (IOException ex) {
             Logger.getLogger(KosApiOperator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-    }
-    
-    public HttpsURLConnection getConnection(){
         return currConn;
     }
     
-    @Remove
-    public void closeConnection(){
+    public void closeConnection(HttpsURLConnection currConn){
         currConn.disconnect();
-        currConn = null;
     }
 }

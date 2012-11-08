@@ -6,6 +6,7 @@ package app.baseDataOperators;
 
 import dbEntity.Stredisko;
 import entityFacade.StrediskoFacade;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -26,6 +27,13 @@ public class StrediskoOperator {
         stredFac.create(stredisko);
         
         return stredisko;
+    }
+
+    public List getAll() {
+        return stredFac.findAll();
+    }
+    public void deleteAll(){
+        stredFac.removeAll();
     }
 }
 

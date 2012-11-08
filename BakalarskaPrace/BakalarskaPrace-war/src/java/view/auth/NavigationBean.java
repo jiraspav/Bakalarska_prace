@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package app.facade;
+package view.auth;
 
-import java.io.Serializable;
+import javax.ejb.Stateless;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
@@ -12,9 +12,9 @@ import javax.inject.Named;
  *
  * @author asus
  */
-@Named(value = "navigationBean")
+@Named(value="navigationBean")
 @RequestScoped
-public class NavigationBean implements Serializable{
+public class NavigationBean {
 
     
     /**

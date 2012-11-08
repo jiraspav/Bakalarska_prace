@@ -7,6 +7,7 @@ package app.baseDataOperators;
 import dbEntity.Mistnost;
 import dbEntity.Stredisko;
 import entityFacade.MistnostFacade;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -30,6 +31,10 @@ public class MistnostOperator {
         misFac.create(mistnost);
         
         return mistnost;
+    }
+
+    public List getAll() {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
     
 }

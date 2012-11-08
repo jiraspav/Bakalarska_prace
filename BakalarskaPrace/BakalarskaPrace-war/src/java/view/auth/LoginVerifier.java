@@ -4,12 +4,18 @@
  */
 package view.auth;
 
-import app.facade.login.impl.LoginServiceEJB;
+import app.encrypt.EncryptUtil;
+import app.facade.login.LoginFacade;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.jms.Session;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import view.SessionHolder.SessionHolderMB;
 import view.bundle.ResourceBundleOperator;
 import view.facesMessenger.FacesMessengerUtil;
@@ -24,8 +30,12 @@ public class LoginVerifier implements Serializable{
     
     private @Inject FacesMessengerUtil faceUtil;
     private @Inject ResourceBundleOperator bundle;
-    private @Inject LoginServiceEJB loginService;
+    //private @Inject LoginServiceEJB loginService;
+    private @Inject LoginFacade loginFac;
     private @Inject SessionHolderMB session;
+    private @Inject NavigationBean naviBean;
+    private @Inject EncryptUtil encrypt;
+    
     
     private String login,password;
     private String regLogin,regPassword;
@@ -41,8 +51,25 @@ public class LoginVerifier implements Serializable{
      * @return String pomocí něhož se rozhodne na kterou stránku se má pokračovat
      */
     public String login(){
-        session.saveNewSession(password);
-        return loginService.login(login,password);
+        
+        session.saveNewSession(login, password);
+        
+        FacesContext ctx = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) ctx.getExternalContext().getRequest();
+        
+        if(request.getUserPrincipal() == null){
+            try {
+                request.login(login, encrypt.SHA256(password));
+                
+                
+            } catch (ServletException ex) {
+
+                return naviBean.validationFail();
+            }
+        }
+        
+        return naviBean.success();
+        
     }
     
     /**
@@ -51,7 +78,22 @@ public class LoginVerifier implements Serializable{
      * @return vrací string pro navigaci
      */
     public String logout(){
-        return loginService.logout();
+        
+        session.killSession();
+        
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ec.getRequest();
+        try {
+            
+            request.logout();
+            ec.invalidateSession();
+            
+        } catch (ServletException ex) {
+            Logger.getLogger(LoginVerifier.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        return naviBean.toIndex();
+        
     }
    
     /**
@@ -60,7 +102,7 @@ public class LoginVerifier implements Serializable{
      */
     public void register(){
             
-            String response = loginService.register(regLogin,regPassword);
+            String response = loginFac.register(regLogin,regPassword);
         
             if(response.equalsIgnoreCase("completed")){
                 
@@ -79,9 +121,24 @@ public class LoginVerifier implements Serializable{
             }
     }
     
+    //--------------------------NUTNO ZMENIT-----------------------
+    
+    public boolean isAdmin(){
+        return true;
+    }
+    
+    
+    
     //--------------------------------------------------------------------------
     //-------------------------GETTERS, SETTERS---------------------------------
     //--------------------------------------------------------------------------
+    
+    /**
+     * @return the login
+     */
+    public String getLogin() {
+        return login;
+    }
     
     /**
      * @param login the login to set
@@ -93,10 +150,24 @@ public class LoginVerifier implements Serializable{
 
 
     /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
      * @param password the password to set
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * @return the regLogin
+     */
+    public String getRegLogin() {
+        return regLogin;
     }
 
     /**
@@ -106,6 +177,12 @@ public class LoginVerifier implements Serializable{
         this.regLogin = regLogin;
     }
 
+    /**
+     * @return the regPassword
+     */
+    public String getRegPassword() {
+        return regPassword;
+    }
     /**
      * @param regPassword the regPassword to set
      */
@@ -129,4 +206,7 @@ public class LoginVerifier implements Serializable{
         else
             return 0;
     }
+
+
+
 }

@@ -16,7 +16,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "GROUPTABLE")
 @NamedQueries({
-    @NamedQuery(name = GroupTable.FIND_GROUPTABLE_BY_LOGIN, query = "SELECT m FROM GroupTable m WHERE m.login = :login")})
+    @NamedQuery(name = GroupTable.FIND_GROUPTABLE_BY_LOGIN, query = "SELECT m FROM GroupTable m WHERE m.login = :login"),
+    @NamedQuery(name = GroupTable.FIND_GROUPTABLE_BY_GROUPID, query = "SELECT m FROM GroupTable m WHERE m.grouptablePK.groupid = :group")})
 public class GroupTable implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -31,6 +32,7 @@ public class GroupTable implements Serializable {
 
     
     public static final String FIND_GROUPTABLE_BY_LOGIN = "GroupTable.findByLogin";
+    public static final String FIND_GROUPTABLE_BY_GROUPID = "GroupTablePK.findByGroupID";
     
     
     public GroupTable() {

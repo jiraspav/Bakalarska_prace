@@ -2,98 +2,55 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package beans.admin;
+package view.admin;
 
-import app.XMLparser.ParserController;
-import view.SessionHolder.SessionHolderMB;
-import view.facesMessenger.FacesMessengerUtil;
+import app.baseDataOperators.SemestrOperator;
+import app.facade.databaseRefresh.DatabaseRefreshFacade;
 import dbEntity.Semestr;
-import dbEntity.UpdateRozvrhu;
-import entityFacade.*;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import javax.ejb.Asynchronous;
-import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import view.SessionHolder.SessionHolderMB;
 import view.bundle.ResourceBundleOperator;
+import view.facesMessenger.FacesMessengerUtil;
 
 /**
  *
  * @author Pavel
  */
-@Named(value = "adminPageBean")
-@ConversationScoped
-public class AdminPageBean implements Serializable{
+@Named(value = "adminPageMB")
+@RequestScoped
+public class AdminPageMB implements Serializable{
     
-    private @Inject RezervaceMistnostiFacade rezFac;
-    private @Inject MistnostFacade mistFac;
-    private @Inject StrediskoFacade strFac;
-    private @Inject PredmetyFacade predFac;
-    private @Inject SemestrFacade semFac;
-    private @Inject RozvrhyFacade rozFac;
-    private @Inject UpdateRozvrhuFacade upRozFac;
-    private @Inject ParserController parsCon;
+    private @Inject SemestrOperator semOper;
+    private @Inject DatabaseRefreshFacade dbFac;
     private @Inject FacesMessengerUtil messUtil;
     private @Inject ResourceBundleOperator bundle;
     private @Inject SessionHolderMB session;
-    private @Inject GroupTableFacade groupFac;
     
     private String confDialog;
-    private Semestr soucasny;
-    private Date posledniAktualizace;
     private boolean ready = true;
     
     /**
      * 
      */
-    public AdminPageBean() {
+    public AdminPageMB() {
     }
 
     /**
      * @return the soucasny
      */
     public Semestr getSoucasny() {
-        
-        List<Semestr> semestry = semFac.findAll();
-        if(semestry.size() > 0)
-            soucasny = (Semestr) semestry.get(semestry.size()-1);
-        else
-            soucasny = new Semestr();
-            
-        return soucasny;
-    }
-
-    /**
-     * @param soucasny the soucasny to set
-     */
-    public void setSoucasny(Semestr soucasny) {
-        this.soucasny = soucasny;
+        return semOper.getLatestSemestr();
     }
 
     /**
      * @return the posledniAktualizace
      */
-    public String getPosledniAktualizace() {
-        
-        List<UpdateRozvrhu> vsechnyUpdaty = upRozFac.findAll();
-        if(vsechnyUpdaty.size() > 0)
-            posledniAktualizace = ((UpdateRozvrhu) vsechnyUpdaty.get(vsechnyUpdaty.size()-1)).getDatumAktualizaceRozvrhu();
-        else
-            posledniAktualizace = new Date();
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        
-        return sdf.format(posledniAktualizace);
-    }
-
-    /**
-     * @param posledniAktualizace the posledniAktualizace to set
-     */
-    public void setPosledniAktualizace(Date posledniAktualizace) {
-        this.posledniAktualizace = posledniAktualizace;
+    public String getLastUpdate() {
+        return dbFac.getLatestUpdate();
     }
     
     /**
@@ -104,68 +61,28 @@ public class AdminPageBean implements Serializable{
         if(ready){
             ready = false;
             
-            if(session.getLoggedUzivatel().getLogin().equals("superadmin")){
+            if(session.getLoggedUzivatelLogin().equals("superadmin")){
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgDefaultAdminUpdateDBRestricted"));
             }
             else{
-                deleteDB();
-                fillDB();
+                dbFac.refreshDatabase();
                 messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgUpdateComp"));
             }
             
             ready = true;
         }
     }
-    /**
-     * metoda naplňující databázi
-     */
-    @Asynchronous
-    public void fillDB(){
-        if(strFac.findAll().isEmpty()){
-            parsCon.fillDepartments();
-        }
-        
-        parsCon.fillCourses();
-        
-        if(mistFac.findAll().isEmpty()){
-            parsCon.fillRooms();
-        }
-        
-        parsCon.fillRozvrhy();
-        parsCon.fillSemestr();
-    }
-    /**
-     * metoda pro smazání databáze
-     */
-    @Asynchronous
-    public void deleteDB(){
-        
-        rezFac.removeAll();
-        
-        rozFac.removeAll();
-        
-        predFac.removeAll();
-        
-        /*
-        mistFac.removeAll();
-        strFac.removeAll();
-        }*/
-        
-        upRozFac.removeAll();
-        
-        semFac.removeAll();
-    }
-    
     
     /**
      * @return the confDialog
      */
     public String getConfDialog() {
         if(ready){
-            confDialog = "Startuji aktualizaci databáze...\nTato operace trvá kolem 20 minut...";
+            confDialog = bundle.getMsg("adminConfDialogStarting");
         }
-        else
-            confDialog = "Právě probíhá aktualizace...";
+        else{
+            confDialog = bundle.getMsg("adminConfDialogInProgress");
+        }
         return confDialog;
     }
 

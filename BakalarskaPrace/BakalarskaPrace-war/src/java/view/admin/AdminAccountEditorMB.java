@@ -2,20 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package beans.admin;
+package view.admin;
 
-import app.XMLparser.ParserController;
-import app.encrypt.EncryptUtil;
-import dbEntity.GroupTable;
-import dbEntity.GrouptablePK;
-import dbEntity.RezervaceMistnosti;
+import app.baseDataOperators.UzivatelOperator;
+import app.facade.accountEditor.AccountEditorFacade;
 import dbEntity.Uzivatel;
-import entityFacade.GroupTableFacade;
-import entityFacade.RezervaceMistnostiFacade;
-import entityFacade.UzivatelFacade;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Random;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -33,28 +25,23 @@ import view.facesMessenger.FacesMessengerUtil;
 @Named("AdminAccEditor")
 @SessionScoped
 
-public class AdminAccountEditor implements Serializable{
+public class AdminAccountEditorMB implements Serializable{
     
-    private @Inject RezervaceMistnostiFacade rezFac;
-    
+    private @Inject AccountEditorFacade accFac;
     private @Inject SessionHolderMB session;
-    private @Inject ParserController parsCon;
-    private @Inject UzivatelFacade uzivFac;
-    private @Inject GroupTableFacade groupFac;
-    private @Inject EncryptUtil encrypt;
     private @Inject FacesMessengerUtil messUtil;
     private @Inject ResourceBundleOperator bundle;
+    private @Inject UzivatelOperator uzivOper;
     
     private DataModel items;
     private Uzivatel selectedRow;
-    private Uzivatel selectedGuestRow;
     private String guestLogin,guestPassword;
     private String confDialog;
     
     /**
      * 
      */
-    public AdminAccountEditor(){}
+    public AdminAccountEditorMB(){}
     
     /**
      * metoda zjišťující, zda je označen guest uživatel
@@ -65,7 +52,7 @@ public class AdminAccountEditor implements Serializable{
         
         if(selectedRow != null){
             if(!selectedRow.getLogin().startsWith("guest")){
-                messUtil.addFacesMsgError("Vybraný účet není guest účet.");
+                messUtil.addFacesMsgError(bundle.getMsg("sysMsgNotGuest"));
             }
         }
         else{
@@ -78,26 +65,15 @@ public class AdminAccountEditor implements Serializable{
      * Těmi jsou : musí být někdo označen, nesmí to být guest účet(guest účty nemohou mít admin roli)
      * 
      */
-    public void pridejAdminRoli(){
+    public void addAdminRights(){
         if(selectedRow != null){
             if(selectedRow.getLogin().startsWith("guest")){
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgGuestNoAdmin"));
             }
             else{
-                GroupTable group = groupFac.getGroupTableByUziv(selectedRow);
-                GrouptablePK groupPK = group.getGrouptablePK();
-                
-                group.setGrouptablePK(groupPK);
-                
-                groupFac.remove(group);
-                
-                groupPK.setGroupid("admin");
-                
-                GroupTable nova = new GroupTable(groupPK);
-                nova.setLogin(group.getLogin());
-                groupFac.create(group);
+                accFac.addAdminRights(selectedRow);
 
-                messUtil.addFacesMsgInfo("Role byla úspěšně změněna.");
+                messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgRoleChanged"));
             }
         }
         else{
@@ -109,38 +85,19 @@ public class AdminAccountEditor implements Serializable{
      * Zároveň provádí kontrolu, zda označený uživatel splňuje kritéria.
      * Těmi jsou : je někdo označen, označený uživatel není zároveň přihlášeným uživatelem
      */
-    public void odeberAdminRoli(){
+    public void removeAdminRights(){
         if(selectedRow != null){
-            if(selectedRow.getLogin().equals(session.getLoggedUzivatel().getLogin())){
-                messUtil.addFacesMsgError("Sám sobě nemůžete odebírat roli administrátora.");
+            
+            if(selectedRow.getLogin().equals(session.getLoggedUzivatelLogin())){
+                messUtil.addFacesMsgError(bundle.getMsg("sysMsgSelfDeadmin"));
             }
-            else if(groupFac.getGroup(selectedRow).equals("admin")){
-                String role;
-                if(selectedRow.getLogin().startsWith("guest")){
-                    role = "guest";
-                }
-                else{
-                List<String> atributy = parsCon.getAtributes(selectedRow.getLogin(),session.getLoggedUzivatel().getLogin(),session.getPassword());
-                 role = atributy.get(2);
-                }
-                GroupTable group = groupFac.getGroupTableByUziv(selectedRow);
-                GrouptablePK groupPK = group.getGrouptablePK();
+            else if(uzivOper.isAdmin(selectedRow)){
+                accFac.removeAdminRights(selectedRow);
                 
-                group.setGrouptablePK(groupPK);
-                
-                groupFac.remove(group);
-                
-                groupPK.setGroupid(role);
-                GroupTable nova = new GroupTable(groupPK);
-                nova.setLogin(group.getLogin());
-                
-                groupFac.create(nova);
-                
-                
-                messUtil.addFacesMsgInfo("Role byla úspěšně změněna.");
+                messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgRoleChanged"));
             }
             else{
-                messUtil.addFacesMsgError("Uživatel není administrátor");
+                messUtil.addFacesMsgError(bundle.getMsg("sysMsgNotAdmin"));
             }
         }
         else{
@@ -155,33 +112,11 @@ public class AdminAccountEditor implements Serializable{
      * poté vygeneruje heslo a vytvoří guest účet
      */
     public void vytvorGuestUcet(){
-        long idGuesta = 1;
-        boolean running = true;
-        while(running){
-            if(uzivFac.find(new Long(idGuesta)) == null)
-                running = false;
-            else{
-                idGuesta++;
-            }
-        }
-        String loginGuesta = "guest"+idGuesta;
-        String randomHeslo = randomString(8);
         
-        Uzivatel uziv = new Uzivatel(new Long(idGuesta));
-        uziv.setLogin(loginGuesta);
-        uziv.setHeslo(encrypt.SHA256(randomHeslo));
-        uziv.setJmeno(loginGuesta);
+        String[] atributes = accFac.createGuestAccount();
         
-        uzivFac.create(uziv);
-        
-        
-        GroupTable group = new GroupTable(loginGuesta, "guest");
-        group.setLogin(loginGuesta);
-        
-        groupFac.create(group);
-        
-        guestLogin = loginGuesta;
-        guestPassword = randomHeslo;
+        guestLogin = atributes[0];
+        guestPassword = atributes[1];
         
     }
     /**
@@ -189,27 +124,21 @@ public class AdminAccountEditor implements Serializable{
      * zároveň kotroluje, zda je někdo označen a jestli skutečně je guest 
      * 
      */
-    public void zrusGuestUcet(){
+    public void deleteAccount(){
         
         if(selectedRow != null){
             
-            if(!selectedRow.getLogin().startsWith("guest")){
-                messUtil.addFacesMsgError("Nemáte označeného uživatele s rolí guest.");
-                
+            if(accFac.isLastAdmin(selectedRow)){
+                messUtil.addFacesMsgError(bundle.getMsg("sysMsgNoGuestSellected"));
             }
             else{
-                List<RezervaceMistnosti> rezervace = rezFac.getRezervaceByUserID(selectedRow);
-                for (RezervaceMistnosti rez : rezervace) {
-                    rezFac.remove(rez);
-                }
-                groupFac.remove(groupFac.getGroupTableByUziv(selectedRow));
-                uzivFac.remove(selectedRow);
+                accFac.deleteAccount(selectedRow);
                 
-                
-                messUtil.addFacesMsgInfo("Guest účet "+selectedRow.getLogin()+" byl úspěšně smazán.");
+                messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgAccountDeletedA") +" "+selectedRow.getLogin()+" "+bundle.getMsg("sysMsgAccountDeletedB"));
                 
                 selectedRow = null;
             }
+            
         }
         else{
             messUtil.addFacesMsgError(bundle.getMsg("sysMsgNoSellected"));
@@ -217,24 +146,17 @@ public class AdminAccountEditor implements Serializable{
     }
     
     
-    String randomString( int len ){
-        
-        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random rnd = new Random();
-        
-        StringBuilder sb = new StringBuilder( len );
-        for( int i = 0; i < len; i++ ) 
-            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
-        return sb.toString();
+
+    public String getRole(Uzivatel uziv){
+        return uzivOper.getUzivatelRole(uziv);
     }
-    
     
     /**
      * @return the items
      */
     public DataModel getItems() {
         
-        items = new ListDataModel(uzivFac.findAll());
+        items = new ListDataModel(uzivOper.getAll());
         
         return items;
     }
@@ -258,20 +180,6 @@ public class AdminAccountEditor implements Serializable{
      */
     public void setSelectedRow(Uzivatel selectedRow) {
         this.selectedRow = selectedRow;
-    }
-
-    /**
-     * @return the selectedGuestRow
-     */
-    public Uzivatel getSelectedGuestRow() {
-        return selectedGuestRow;
-    }
-
-    /**
-     * @param selectedGuestRow the selectedGuestRow to set
-     */
-    public void setSelectedGuestRow(Uzivatel selectedGuestRow) {
-        this.selectedGuestRow = selectedGuestRow;
     }
 
     /**
@@ -309,13 +217,11 @@ public class AdminAccountEditor implements Serializable{
      */
     public String getConfDialog() {
         if(selectedRow != null){
-            confDialog = "Skutečně smazat? Budou zrušeny všechny rezervace vázané na tento účet.";
-            if(!selectedRow.getLogin().startsWith("guest")){
-                confDialog = "Označený uživatel "+selectedRow.getLogin()+" není guest účet.";
-            }
+            confDialog = bundle.getMsg("adminAccountEditorLabelConfDialog");
+
         }
         else{
-            confDialog = "Nemáte označeného žadné uživatele.";
+            confDialog = bundle.getMsg("sysMsgNoSellected");
         }
         return confDialog;
     }

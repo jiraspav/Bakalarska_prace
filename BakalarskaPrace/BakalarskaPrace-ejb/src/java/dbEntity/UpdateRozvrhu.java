@@ -5,6 +5,7 @@
 package dbEntity;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -61,7 +62,11 @@ public class UpdateRozvrhu implements Serializable {
     public Date getDatumAktualizaceRozvrhu() {
         return datumAktualizaceRozvrhu;
     }
-
+    public String getFormattedDateUpdateRozvrhu(){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        return sdf.format(this.datumAktualizaceRozvrhu);
+    }
+    
     public void setDatumAktualizaceRozvrhu(Date datumAktualizaceRozvrhu) {
         this.datumAktualizaceRozvrhu = datumAktualizaceRozvrhu;
     }

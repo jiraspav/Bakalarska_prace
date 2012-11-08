@@ -33,17 +33,30 @@ public class SessionHolderMB implements Serializable {
     
     
     
-    public void saveNewSession(String pass){
-        FacesContext ctx = FacesContext.getCurrentInstance();
-        loggedIn = (Uzivatel) uzivOper.getUzivatel(ctx.getExternalContext().getUserPrincipal().getName());
+    public void saveNewSession(String login, String pass){
+        session.saveNewSession(loggedIn, pass);
+        
+        loggedIn = (Uzivatel) uzivOper.getUzivatel(login);
         password = pass;
+        
     }
+    
+    
     
     @Remove
     public void killSession(){
         session.killSession();
+        
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();      
         password = null;
+    }
+    
+    public String getLoggedUzivatelName(){
+        return uzivOper.getUzivatelName(loggedIn);
+    }
+    
+    public String getLoggedUzivatelRole(){
+        return uzivOper.getUzivatelRole(loggedIn);
     }
     
     public String getLoggedUzivatelLogin(){

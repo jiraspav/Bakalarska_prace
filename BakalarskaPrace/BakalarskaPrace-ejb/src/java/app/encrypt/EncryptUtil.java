@@ -6,6 +6,7 @@ package app.encrypt;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
@@ -40,5 +41,17 @@ public class EncryptUtil {
             Logger.getLogger(EncryptUtil.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+    
+    
+    public String randomString( int len ){
+        
+        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random rnd = new Random();
+        
+        StringBuilder sb = new StringBuilder( len );
+        for( int i = 0; i < len; i++ ) 
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        return sb.toString();
     }
 }

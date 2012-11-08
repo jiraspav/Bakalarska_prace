@@ -7,7 +7,9 @@ package app.baseDataOperators;
 import dbEntity.Semestr;
 import dbEntity.UpdateRozvrhu;
 import entityFacade.UpdateRozvrhuFacade;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -32,6 +34,23 @@ public class UpdateRozvrhuOperator {
         
         return update;
         
+    }
+    
+    public UpdateRozvrhu getLastUpdate() {
+        
+        UpdateRozvrhu last;
+            
+        List<UpdateRozvrhu> vsechnyUpdaty = updateFac.findAll();
+        if(vsechnyUpdaty.size() > 0)
+            last = vsechnyUpdaty.get(vsechnyUpdaty.size()-1);
+        else
+            last = new UpdateRozvrhu(1, new Date());
+        
+        return last;
+    }
+
+    public void deleteAll() {
+        updateFac.removeAll();
     }
     
 }

@@ -10,6 +10,7 @@ import dbEntity.Uzivatel;
 import entityFacade.DenVTydnuFacade;
 import entityFacade.GroupTableFacade;
 import entityFacade.UzivatelFacade;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -38,13 +39,26 @@ public class UzivatelOperator {
     
     public void buildDefaultUzivatel(){
         
-        createUzivatel(1, "superadmin", crypt.SHA256("admin"), "Default administrátor");
+        Uzivatel uziv = createUzivatel(1, "superadmin", crypt.SHA256("admin"), "Default administrátor");
 
-        
         GroupTable groupTab = new GroupTable("superadmin","admin");
-        groupTab.setLogin("superadmin");
 
         groupFac.create(groupTab);
+    }
+    
+    
+    
+    public boolean isAdmin(Uzivatel uziv){
+        if(groupFac.getGroup(uziv).equals("admin")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public List<Uzivatel> getAll(){
+        return uzivFac.findAll();
     }
     
     public Uzivatel getUzivatel(Uzivatel uziv){
@@ -54,4 +68,19 @@ public class UzivatelOperator {
     public Uzivatel getUzivatel(String name){
         return uzivFac.getUserByLogin(name);
     }
+
+    public String getUzivatelName(Uzivatel uziv) {
+        return uziv.getJmeno();
+    }
+    public String getUzivatelRole(Uzivatel uziv){
+        return groupFac.getGroup(uziv);
+    }
+    public String getUzivatelLogin(Uzivatel uziv){
+        return uziv.getLogin();
+    }
+    public void delete(Uzivatel uziv){
+        uzivFac.remove(uziv);
+    }
+
+
 }

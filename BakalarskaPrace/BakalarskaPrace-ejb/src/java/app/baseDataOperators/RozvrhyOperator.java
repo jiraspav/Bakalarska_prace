@@ -37,5 +37,9 @@ public class RozvrhyOperator {
         
         return rozvrh;
     }
+
+    public void deleteAll() {
+        rozFac.removeAll();
+    }
     
 }

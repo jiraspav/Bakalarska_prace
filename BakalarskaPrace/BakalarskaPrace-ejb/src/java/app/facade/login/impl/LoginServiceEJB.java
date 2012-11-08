@@ -10,22 +10,15 @@ import app.baseDataOperators.GroupTableOperator;
 import app.baseDataOperators.KosApiOperator;
 import app.baseDataOperators.UzivatelOperator;
 import app.encrypt.EncryptUtil;
-import app.facade.NavigationBean;
 import app.facade.login.LoginFacade;
-import app.sessionHolder.SessionHolderEJB;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Remote;
+import javax.ejb.Local;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  *
@@ -33,37 +26,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 @Stateless
-@Remote(LoginFacade.class)
-@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+@Local(LoginFacade.class)
 public class LoginServiceEJB implements LoginFacade{
 
-    private @Inject NavigationBean naviBean;
     private @Inject EncryptUtil encrypt;
     private @Inject UzivatelOperator uzivOperator;
     private @Inject GroupTableOperator groupOperator;
     private @Inject KosApiOperator kosOperator;
     private @Inject ParserController parsCon;
     
-    @Override
-    public String login(String login, String password) {
-        
-        FacesContext ctx = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest) ctx.getExternalContext().getRequest();
-        
-        if(request.getUserPrincipal() == null){
-            try {
-                request.login(login, encrypt.SHA256(password));
-                
-                
-            } catch (ServletException ex) {
-
-                return naviBean.validationFail();
-            }
-        }
-        
-        return naviBean.success();
-        
-    }
 
     @Override
     public String register(String regLogin, String regPassword) {
@@ -91,22 +62,6 @@ public class LoginServiceEJB implements LoginFacade{
             }
     }
 
-    @Override
-    public String logout() {
-        
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) ec.getRequest();
-        try {
-            
-            request.logout();
-            ec.invalidateSession();
-            
-        } catch (ServletException ex) {
-            Logger.getLogger(LoginServiceEJB.class.getName()).log(Level.SEVERE, null, ex);
-            
-        }
-        return naviBean.toIndex();    
-    }
     
     /**
      * metoda zjišťující správnost loginu a hesla co se týče jejich registrace na FELu
@@ -119,11 +74,11 @@ public class LoginServiceEJB implements LoginFacade{
     public boolean isValid(String login, String password){
         int serverResponse = 0;
         try {
-            kosOperator.createNewConnection(kosapiUrls.validation, login, password);
+            HttpsURLConnection conn = kosOperator.createNewConnection(kosapiUrls.validation, login, password);
             
-            serverResponse = kosOperator.getConnection().getResponseCode();
+            serverResponse = conn.getResponseCode();
             
-            kosOperator.closeConnection();
+            kosOperator.closeConnection(conn);
 
         } catch (IOException ex) {
             Logger.getLogger(LoginServiceEJB.class.getName()).log(Level.SEVERE, null, ex);

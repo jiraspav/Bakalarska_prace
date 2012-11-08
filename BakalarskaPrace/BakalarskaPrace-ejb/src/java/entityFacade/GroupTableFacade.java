@@ -6,6 +6,7 @@ package entityFacade;
 
 import dbEntity.GroupTable;
 import dbEntity.Uzivatel;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -38,7 +39,19 @@ public class GroupTableFacade extends AbstractFacade<GroupTable> {
     public GroupTable getGroupTableByUziv(Uzivatel uziv){
         Query qr = em.createNamedQuery(GroupTable.FIND_GROUPTABLE_BY_LOGIN);
         qr.setParameter("login", uziv.getLogin());
-        GroupTable table = (GroupTable) qr.getSingleResult();
-        return table;
+
+        return (GroupTable) qr.getSingleResult();
+    }
+    public GroupTable getGroupTableByUziv(String login){
+        Query qr = em.createNamedQuery(GroupTable.FIND_GROUPTABLE_BY_LOGIN);
+        qr.setParameter("login", login);
+        
+        return (GroupTable) qr.getSingleResult();
+    }
+    public List<GroupTable> getGroupTableByRole(String role){
+        Query qr = em.createNamedQuery(GroupTable.FIND_GROUPTABLE_BY_GROUPID);
+        qr.setParameter("group", role);
+        
+        return qr.getResultList();
     }
 }

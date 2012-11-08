@@ -28,5 +28,9 @@ public class PredmetyOperator {
         
         return predmet;
     }
+
+    public void deleteAll() {
+        predFac.removeAll();
+    }
     
 }
