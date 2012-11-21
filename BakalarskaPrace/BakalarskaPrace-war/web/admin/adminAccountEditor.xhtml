@@ -33,7 +33,7 @@
                         <p:commandButton value="#{msgs.adminAccountEditorLabelButtonAddAdminRights}" actionListener="#{AdminAccEditor.addAdminRights()}" update="tabulkaUzivatelu :form:msgs" />  
                         <p:commandButton value="#{msgs.adminAccountEditorLabelButtonRemoveAdminRights}" actionListener="#{AdminAccEditor.removeAdminRights()}" update="tabulkaUzivatelu :form:msgs" />  
                         <p:commandButton value="#{msgs.adminAccountEditorLabelButtonNewGuest}" actionListener="#{AdminAccEditor.vytvorGuestUcet()}" oncomplete="guestDialog.show()" update="tabulkaUzivatelu :form:msgs :form:guestDetails" />  
-                        <p:commandButton value="#{msgs.adminAccountEditorLabelButtonRemoveAccount}" actionListener="#{AdminAccEditor.checkGuest()}" oncomplete="confirmDialog.show()" update=":form:msgs :form:confDialog" />  
+                        <p:commandButton value="#{msgs.adminAccountEditorLabelButtonRemoveAccount}" actionListener="#{AdminAccEditor.checkSellected()}" oncomplete="confirmDialog.show()" update=":form:msgs :form:confDialog" />  
                     </f:facet> 
                     
                      

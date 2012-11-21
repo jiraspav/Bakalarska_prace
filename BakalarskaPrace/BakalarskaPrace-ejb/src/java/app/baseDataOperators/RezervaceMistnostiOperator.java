@@ -21,10 +21,29 @@ import javax.inject.Inject;
 public class RezervaceMistnostiOperator {
     
     private @Inject RezervaceMistnostiFacade rezFac;
-
     
+    public void createRezervaceMistnosti(Uzivatel uziv, Mistnost mistnost, Date startDate, Date casOd, Date casDo, boolean naCelouMistnost, String popis){
+        RezervaceMistnosti rez = new RezervaceMistnosti(uziv, mistnost, startDate, casOd, casDo, naCelouMistnost, popis);
+        
+        rezFac.create(rez);
+    }
     
+    public void editRezervaceMistnosti(RezervaceMistnosti rez, Uzivatel iDuser, Mistnost iDmistnosti, Date datumRezervace, Date od, Date do1, Boolean naCelouMistnost, String popis) {
+        if(iDuser != null){rez.setIDuser(iDuser);}
+        if(iDmistnosti != null){rez.setIDmistnosti(iDmistnosti);}
+        if(datumRezervace != null){rez.setDatumRezervace(datumRezervace);}
+        if(od != null){rez.setOd(od);}
+        if(do1 != null){rez.setDo1(do1);}
+        if(naCelouMistnost != null){rez.setNaCelouMistnost(naCelouMistnost);}
+        if(popis != null){rez.setPopis(popis);}
+        
+        rezFac.edit(rez);
     
+    }
+    
+    public void deleteReservation(RezervaceMistnosti rez){
+        rezFac.remove(rez);
+    }
     
     public List<RezervaceMistnosti> getRezervace(Uzivatel uziv){
         return rezFac.getRezervaceByUserID(uziv);

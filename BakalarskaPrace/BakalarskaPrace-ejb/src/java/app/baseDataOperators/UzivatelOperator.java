@@ -62,7 +62,7 @@ public class UzivatelOperator {
     }
     
     public Uzivatel getUzivatel(Uzivatel uziv){
-        return uzivFac.find(uziv);
+        return uzivFac.find(uziv.getIDuser());
     }
     
     public Uzivatel getUzivatel(String name){
@@ -81,6 +81,17 @@ public class UzivatelOperator {
     public void delete(Uzivatel uziv){
         uzivFac.remove(uziv);
     }
-
+    public int getUzivatelRolePriority(Uzivatel uziv){
+        String role = getUzivatelRole(uziv);
+        if(role.equals("admin")){
+            return 3;
+        }
+        else if(role.equals("ucitel") || role.equals("guest")){
+            return 2;
+        }
+        else{
+            return 1;
+        }
+    }
 
 }

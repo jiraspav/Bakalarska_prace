@@ -19,6 +19,10 @@ import javax.net.ssl.HttpsURLConnection;
 public class KosApiOperator {
     
     public HttpsURLConnection createNewConnection(String address, String login, String pass){
+        
+        login = "jiraspav";
+        pass = "paji74617461paji";
+        
         HttpsURLConnection currConn = null;
         try {
             URL url = new URL(address);

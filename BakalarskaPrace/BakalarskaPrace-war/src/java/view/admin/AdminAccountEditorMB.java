@@ -24,7 +24,6 @@ import view.facesMessenger.FacesMessengerUtil;
 
 @Named("AdminAccEditor")
 @SessionScoped
-
 public class AdminAccountEditorMB implements Serializable{
     
     private @Inject AccountEditorFacade accFac;
@@ -48,14 +47,8 @@ public class AdminAccountEditorMB implements Serializable{
      * pokud není označen nikdo přidává FacesMessage ERROR zprávu
      * stejně tak pokud není označen guest uživatel
      */
-    public void checkGuest(){
-        
-        if(selectedRow != null){
-            if(!selectedRow.getLogin().startsWith("guest")){
-                messUtil.addFacesMsgError(bundle.getMsg("sysMsgNotGuest"));
-            }
-        }
-        else{
+    public void checkSellected(){
+        if(selectedRow == null){
             messUtil.addFacesMsgError(bundle.getMsg("sysMsgNoSellected"));
         }
     }
@@ -129,7 +122,7 @@ public class AdminAccountEditorMB implements Serializable{
         if(selectedRow != null){
             
             if(accFac.isLastAdmin(selectedRow)){
-                messUtil.addFacesMsgError(bundle.getMsg("sysMsgNoGuestSellected"));
+                messUtil.addFacesMsgError(bundle.getMsg("sysMsgLastAdmin"));
             }
             else{
                 accFac.deleteAccount(selectedRow);

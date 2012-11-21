@@ -39,4 +39,8 @@ public class DnyVTydnuOperator {
             den = new DenVTydnu(new Integer(8), "Neznámý");
         denFac.create(den);
     }
+    
+    public DenVTydnu getCZDen(String nazev){
+        return denFac.getDenByCeskyNazev(nazev);
+    }
 }

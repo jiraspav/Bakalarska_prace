@@ -4,6 +4,9 @@
  */
 package beans.mistnosti;
 
+import app.baseDataOperators.MistnostOperator;
+import app.facade.reservationEditor.ReservationEditorFacade;
+import app.facade.schedulerEditorPF.SchedulerEditorPFFacade;
 import view.auth.LoginVerifier;
 import beans.mistnosti.VytvoreniRezervaceBean;
 import dbEntity.*;
@@ -31,6 +34,8 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import view.SessionHolder.SessionHolderMB;
+import view.bundle.ResourceBundleOperator;
+import view.facesMessenger.FacesMessengerUtil;
 
 /**
  *
@@ -40,25 +45,23 @@ import view.SessionHolder.SessionHolderMB;
 @SessionScoped
 public class scheduleMistnostiController implements Serializable {
 
-    @Inject SessionHolderMB session;
-    @Inject LoginVerifier user;
-    @Inject UzivatelFacade uzivFac;
-    @Inject DenVTydnuFacade denFac;
-    @Inject RozvrhyFacade rozFac;
-    @Inject MistnostFacade misFac;
-    @Inject VytvoreniRezervaceBean vytBean;
-    @Inject RezervaceMistnostiFacade rezFac;
-    @Inject GroupTableFacade groupFac;
+    @Inject private ReservationEditorFacade resFac;
+    @Inject private SchedulerEditorPFFacade schedFac;
+    @Inject private FacesMessengerUtil facUtil;
+    @Inject private ResourceBundleOperator bundle;
+    @Inject private VytvoreniRezervaceBean vytBean;
+    @Inject private SessionHolderMB session;
+    @Inject private MistnostOperator mistOper;
+    
+    
     private ScheduleModel eventModel;
     private ScheduleEvent event = new DefaultScheduleEvent();
     private String popis = " ";
     private Date casOd = new Date(),casDo = new Date();
     private boolean naCelouMistnost = false;
-    private ArrayList<RezervaceMistnosti> rezervace;
+    
     private TimeZone timeZone = TimeZone.getTimeZone("Europe/Prague");
 
-    
-    
     
     /**
      * 
@@ -68,147 +71,50 @@ public class scheduleMistnostiController implements Serializable {
         //System.out.println("Constructor called;");
     }
     
-    private Date putTogetherTimeDate(Date date,Date time){
-        Calendar datum = GregorianCalendar.getInstance();
-        datum.setTime(date);
-        Calendar cas = GregorianCalendar.getInstance();
-        cas.setTime(time);
-
-        Calendar celkem = GregorianCalendar.getInstance();
-        celkem.set(datum.get(Calendar.YEAR), datum.get(Calendar.MONTH), datum.get(Calendar.DAY_OF_MONTH),
-                    cas.get(Calendar.HOUR_OF_DAY), cas.get(Calendar.MINUTE), cas.get(Calendar.SECOND));
-        Date nove = celkem.getTime();
-        return nove;
-    }
-    
-    /**
-     * metoda, vytvářející nový model pro PrimeFaces komponentu p:schedule
-     * @param mistnost
-     * @return hotový model
-     */
-    public ScheduleModel setSchedule(Mistnost mistnost){
-        //FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Generating new ScheduleModel" ,"Delka listu : "+rezervace.size()) ;
-        //addMessage(message);
-        rezervace = new ArrayList(rezFac.getRezervaceByMistnostID(mistnost));
-        Iterator iter = rezervace.iterator();
-        while(iter.hasNext()){
-            RezervaceMistnosti rezer = (RezervaceMistnosti) iter.next();
-            Date datumOd = putTogetherTimeDate(rezer.getDatumRezervace(), rezer.getOd());
-            Date datumDo = putTogetherTimeDate(rezer.getDatumRezervace(), rezer.getDo1());
-            if(rezer.getIDmistnosti().equals(mistnost)){
-                DefaultScheduleEvent event2 = new DefaultScheduleEvent(groupFac.getGroup(rezer.getIDuser())+":"+rezer.getIDuser().getLogin()+":"+rezer.getPopis(), 
-                                        datumOd, datumDo);
-                eventModel.addEvent(event2);
-            }
-        }
-        
-        return eventModel;
-    }
-    
     /**
      * metoda pro přidávání eventů do schedule modelu (nových rezervací)
      * @param actionEvent
      */
     public void addEvent(ActionEvent actionEvent) {
-        if (getEvent().getId() == null && vytBean.getSelectedNode() != null) {
-            boolean ok = true,rozvrhCheck = false,rezervaceCheck = false;
-            if(vytBean.getSelectedNode().isLeaf() && !vytBean.getSelectedNode().equals(vytBean.getRoot())){
+        
+        if(vytBean.getSelectedNode() == null){
+            facUtil.addFacesMsgError(bundle.getMsg("sysMsgNoRoomSellected"));
+       
+        }
+        else {
+            
             if(casOd.before(casDo)){
-                //System.out.println(vytBean.getSelectedNode()+" --- "+vytBean.getRoot());
-                RezervaceMistnosti nova = new RezervaceMistnosti(new Integer(10), getEvent().getStartDate(), casOd, casDo, naCelouMistnost, popis);
-                Mistnost mistnost = misFac.findMistnostPodleZkratky((String)vytBean.getSelectedNode().getData().toString());
-                Uzivatel uziv = uzivFac.getUserByLogin(session.getLoggedUzivatelLogin());
-
-                SimpleDateFormat sdf = new SimpleDateFormat("EEEE",Locale.ENGLISH);
-
-                DenVTydnu denRezervace = denFac.getDenByNazev(sdf.format(getEvent().getStartDate()).toUpperCase());
-
-                ArrayList rezervaceMistnosti = new ArrayList(rezFac.getRezervaceByMistnostID(mistnost));
-                ArrayList rozvrhyMistnosti = new ArrayList(rozFac.findByMistnostAden(mistnost, denRezervace));
-
-                Iterator iter = rozvrhyMistnosti.iterator();
                 
-                while(iter.hasNext()){
-                    Rozvrhy rez = (Rozvrhy) iter.next();
-                    if(!((casOd.after(rez.getDo1())) || (casDo.before(rez.getOd())))){
-                        ok = false;
-                        rozvrhCheck = true;
-                    }
-                }
+                String mistShort = vytBean.getSelectedNode().getData().toString();
+                
+                String response = resFac.isReservationOK(mistShort, getEvent().getStartDate(), casOd, casDo);
+                
 
-                iter = rezervaceMistnosti.iterator();
-
-                while(iter.hasNext()){
-                    RezervaceMistnosti rez = (RezervaceMistnosti) iter.next();
-                    if(getEvent().getStartDate().equals(rez.getDatumRezervace()))
-                    if(!((casOd.after(rez.getDo1())) || (casDo.before(rez.getOd())))){
-                        if(rez.getNaCelouMistnost() && (user.getRolePriority(groupFac.getGroup(rez.getIDuser())) >= user.getRolePriority(groupFac.getGroup(uzivFac.getUserByLogin(session.getLoggedUzivatelLogin())))) ){
-                            ok = false;
-                            rezervaceCheck = true;
-                        }
-                    }
-                }
-
-
-                if(ok){
-
-                    nova.setIDuser(uziv);
-                    nova.setIDmistnosti(mistnost);
-
-                    try {
-                        rezFac.create(nova);
+                if(response.equals("ok")){
+                    
+                        resFac.createReservation(session.getLoggedUzivatel(), mistOper.getMistnost(mistShort), event.getStartDate(), casOd, casDo, naCelouMistnost, popis);
+                    
                         getEventModel().addEvent(getEvent());
-
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "" ,"Úspěšně rezervováno.") ;
-
-                        addMessage(message);
-
-                    } catch (Exception e) {
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_FATAL, "Fatal error" ,"Could not write into database") ;
-                        addMessage(message);
-                    }
+                        
+                        facUtil.addFacesMsgInfo(bundle.getMsg("sysMsgSuccReserved"));
 
                 }
-                else if(rozvrhCheck){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,"Na tomto místě jsou již rozvrhy.") ;
-                    addMessage(message);
+                else if(response.equals("alreadyscheduled")){
+                    facUtil.addFacesMsgError(bundle.getMsg("sysMsgAlreadyScheduled"));
+                    
                 }
                 else{
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,"Již rezervováno.") ;
-                    addMessage(message);
+                    facUtil.addFacesMsgError(bundle.getMsg("sysMsgAlreadyReserved"));
+                    
                 }
-            } else if(!casOd.before(casDo)) {
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,"Čas od musí být před časem do.") ;
-                addMessage(message);
-            }
-            }else {
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,"Nemáte označenou žádnou místnost.") ;
-                addMessage(message);
+            } else {
+                facUtil.addFacesMsgError(bundle.getMsg("sysMsgWrongTimes"));
+                
             }
             setEvent(new DefaultScheduleEvent());
-        }else if(vytBean.getSelectedNode() == null){
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,"Nemáte označenou žádnou místnost.") ;
-            addMessage(message);
         }
     }
 
-    
-
-    /**
-     * metoda pro hledání rezervací v List objektu
-     * @param rez hledaná rezervace
-     * @return pozice v List objektu
-     */
-    public int findInList(RezervaceMistnosti rez){
-        
-        for(int i = 0; i<rezervace.size();i++){
-            RezervaceMistnosti curr = rezervace.get(i);
-            if(curr.equals(rez))
-                return i;
-        }
-        return -1;
-    }
-    
     /**
      * ActionListener pro schedule komponentu
      * @param selectEvent
@@ -218,24 +124,14 @@ public class scheduleMistnostiController implements Serializable {
         
     }
 
-    
-
-    private void addMessage(FacesMessage message) {
-        FacesContext.getCurrentInstance().addMessage(null, message);
-        
-    }
-
     /**
      * @return the eventModel
      */
     public ScheduleModel getEventModel() {
         eventModel.clear();
-        if(vytBean.getSelectedNode() != null)
-            if(vytBean.getSelectedNode().isLeaf() && !vytBean.getSelectedNode().equals(vytBean.getRoot())){
-                String zkratka = vytBean.getSelectedNode().getData().toString();
-                Mistnost mistnost = misFac.findMistnostPodleZkratky(zkratka);
-                return setSchedule(mistnost);
-            }
+        
+        eventModel = schedFac.createNewModel(vytBean.getSelectedNode());
+        
         return eventModel;
     }
 
@@ -324,8 +220,4 @@ public class scheduleMistnostiController implements Serializable {
     public void setNaCelouMistnost(boolean naCelouMistnost) {
         this.naCelouMistnost = naCelouMistnost;
     }
-
-    
-
-    
 }

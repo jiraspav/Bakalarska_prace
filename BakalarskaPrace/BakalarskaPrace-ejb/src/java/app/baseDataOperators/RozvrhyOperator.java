@@ -10,6 +10,7 @@ import dbEntity.Predmety;
 import dbEntity.Rozvrhy;
 import entityFacade.RozvrhyFacade;
 import java.util.Date;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -40,6 +41,13 @@ public class RozvrhyOperator {
 
     public void deleteAll() {
         rozFac.removeAll();
+    }
+    
+    public List<Rozvrhy> getRozvrhy(Mistnost mist){
+        return rozFac.findByMistnost(mist);
+    }
+    public List<Rozvrhy> getRozvrhy(Mistnost mist, DenVTydnu den){
+        return rozFac.findByMistnostAden(mist, den);
     }
     
 }

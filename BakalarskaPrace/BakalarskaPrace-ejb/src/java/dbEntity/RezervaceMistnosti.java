@@ -84,6 +84,16 @@ public class RezervaceMistnosti implements Serializable {
         this.popis = popis;
     }
 
+    public RezervaceMistnosti(Uzivatel uziv, Mistnost mistnost,Date datumRezervace, Date od, Date do1, boolean naCelouMistnost, String popis) {
+        this.iDuser = uziv;
+        this.iDmistnosti = mistnost;
+        this.datumRezervace = datumRezervace;
+        this.od = od;
+        this.do1 = do1;
+        this.naCelouMistnost = naCelouMistnost;
+        this.popis = popis;
+    }
+    
     public Integer getIDrezervace() {
         return iDrezervace;
     }

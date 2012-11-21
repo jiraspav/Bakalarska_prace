@@ -33,8 +33,13 @@ public class MistnostOperator {
         return mistnost;
     }
 
-    public List getAll() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public List<Mistnost> getAll() {
+        return misFac.findAll();
     }
-    
+    public List<Mistnost> getMistnosti(Stredisko stred){
+        return misFac.findMistnostiStrediska(stred);
+    }   
+    public Mistnost getMistnost(String zkratka){
+        return misFac.findMistnostPodleZkratky(zkratka);
+    }
 }

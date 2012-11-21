@@ -35,72 +35,72 @@
                 </p:column>
                 
                <f:facet name="footer">  
-                   <p:commandButton value="Zobrazit" icon="ui-icon-search" oncomplete="rezDialog.show()" update=":form:details :form:eventDetails :form:rezMsgs" ajax="true" process="@parent" />  
+                   <p:commandButton value="#{msgs.mojeRezervaceButt}" icon="ui-icon-search" oncomplete="rezDialog.show()" update=":form:details :form:eventDetails :form:rezMsgs" ajax="true" process="@parent" />  
                 </f:facet>  
 
             </p:dataTable>  
             
                 
-                <p:dialog id="dialog" header="Detaily rezervace" widgetVar="rezDialog" resizable="false"  
+                <p:dialog id="dialog" header="#{msgs.mojeRezervaceDetails}" widgetVar="rezDialog" resizable="false"  
                     width="200" showEffect="clip" hideEffect="fold">  
 
                 <h:panelGrid id="details" columns="2" cellpadding="4">  
 
-                    <h:outputText value="Místnost:" />  
-                    <h:outputText value="#{mojeRezervaceBean.zkratka}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceRoom}" />  
+                    <h:outputText value="#{mojeRezervaceBean.selectedRow.zkratka}" />  
 
-                    <h:outputText value="Datum:" />  
-                    <h:outputText value="#{mojeRezervaceBean.datumRezervace}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceDate}" />  
+                    <h:outputText value="#{mojeRezervaceBean.selectedRow.datumRezervace}" />  
 
-                    <h:outputText value="Od:" />  
-                    <h:outputText value="#{mojeRezervaceBean.od}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceFrom}" />  
+                    <h:outputText value="#{mojeRezervaceBean.selectedRow.od}" />  
 
-                    <h:outputText value="Do:" />  
-                    <h:outputText value="#{mojeRezervaceBean.do1}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceTo}" />  
+                    <h:outputText value="#{mojeRezervaceBean.selectedRow.do1}" />  
                     
-                    <h:outputText value="Popis:" />  
-                    <h:outputText value="#{mojeRezervaceBean.popis}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceDesc}" />  
+                    <h:outputText value="#{mojeRezervaceBean.selectedRow.popis}" />  
                     
-                    <h:outputText value="Na celou místnost:" />  
-                    <h:outputText value="#{mojeRezervaceBean.naCelouMistnost}" />  
+                    <h:outputText value="#{msgs.mojeRezervaceWholeRoom}" />  
+                   <h:outputText value="false" />  
                     
-                    <p:commandButton value="Změnit" oncomplete="zmenDialog.show()"/>
-                    <p:commandButton value="Zrušit" oncomplete="confirmDialog.show()"/>
+                    <p:commandButton value="#{msgs.mojeRezervaceChangeButt}" oncomplete="zmenDialog.show()"/>
+                    <p:commandButton value="#{msgs.mojeRezervaceCancelButt}" oncomplete="confirmDialog.show()"/>
                 </h:panelGrid>  
             </p:dialog>  
                 
-                <p:dialog widgetVar="zmenDialog" header="Změnit rezervaci" showEffect="clip" hideEffect="clip" modal="true">  
+                <p:dialog widgetVar="zmenDialog" header="#{msgs.mojeRezervaceDialogHeader}" showEffect="clip" hideEffect="clip" modal="true">  
                 <p:messages id="rezMsgs" showDetail="true" globalOnly="true"/>
                 <h:panelGrid id="eventDetails" columns="3">  
-                    <h:outputLabel for="popis" value="Popis: "/>
-                    <h:inputTextarea id="popis" value="#{mojeRezervaceBean.popis}"/>
+                    <h:outputLabel for="popis" value="#{msgs.mojeRezervaceDesc}"/>
+                    <h:inputTextarea id="popis" value="#{mojeRezervaceBean.selectedRow.popis}"/>
                     <h:outputText/>
-                    <h:outputLabel for="mistnost" value="Místnost: " />  
-                    <h:outputText id="mistnost" value="#{mojeRezervaceBean.zkratka}"/>
+                    <h:outputLabel for="mistnost" value="#{msgs.mojeRezervaceRoom}" />  
+                    <h:outputText id="mistnost" value="#{mojeRezervaceBean.selectedRow.IDmistnosti.zkratka}"/>
                     <h:outputText/>
-                    <h:outputLabel for="datum" value="Datum:" />  
-                    <p:calendar value="#{mojeRezervaceBean.dateDatumRezervace}" id="datum" required="true"/>
+                    <h:outputLabel for="datum" value="#{msgs.mojeRezervaceDate}" />  
+                    <p:calendar value="#{mojeRezervaceBean.editDateOfReservation}" id="datum" required="true"/>
                     <p:message for="datum" display="icon"/>
-                    <h:outputText  value="Od cas: " />  
-                    <p:calendar value="#{mojeRezervaceBean.dateOd}" id="casOd" pattern="HH:mm" timeOnly="true" required="true"/>
+                    <h:outputText  value="#{msgs.mojeRezervaceFrom}" />  
+                    <p:calendar value="#{mojeRezervaceBean.editDateFrom}" id="casOd" pattern="HH:mm" timeOnly="true" required="true"/>
                     <p:message for="casOd" display="icon"/>
-                    <h:outputText  value="Do cas: " />  
-                    <p:calendar value="#{mojeRezervaceBean.dateDo1}" id="casDo" pattern="HH:mm" timeOnly="true" required="true"/>
+                    <h:outputText  value="#{msgs.mojeRezervaceTo}" />  
+                    <p:calendar value="#{mojeRezervaceBean.editDateTo}" id="casDo" pattern="HH:mm" timeOnly="true" required="true"/>
                     <p:message for="casDo" display="icon"/>
-                    <h:outputLabel for="naCelouMistnost" value="Na celou místnost: " />  
-                    <p:selectBooleanCheckbox id="naCelouMistnost" value="#{mojeRezervaceBean.naCelouMistnost}"  />
+                    <h:outputLabel for="naCelouMistnost" value="#{msgs.mojeRezervaceWholeRoom}" />  
+                    <p:selectBooleanCheckbox id="naCelouMistnost" value="false"  />
                     <h:outputText/>
                 </h:panelGrid>
 
-                <p:commandButton value="Změnit" actionListener="#{mojeRezervaceBean.uprav()}" update="tabulkaRezervaci rezMsgs eventDetails" ajax="true" process="@parent"/>  
+                <p:commandButton value="#{msgs.mojeRezervaceChangeButt}" actionListener="#{mojeRezervaceBean.editReservation()}" update="tabulkaRezervaci rezMsgs eventDetails" ajax="true" process="@parent"/>  
 
             </p:dialog>  
                 
-            <p:dialog id="confDialog" header="Potvrzení" widgetVar="confirmDialog" resizable="false"  
+                <p:dialog id="confDialog" header="#{msgs.mojeRezervaceConfDialogHeader}" widgetVar="confirmDialog" resizable="false"  
                       width="200" showEffect="clip" hideEffect="fold" modal="true">
-                <h:outputText value="Skutečně smazat?"/>
+                    <h:outputText value="#{msgs.mojeRezervaceConfDialogConf}"/>
                 <h:panelGrid columns="2">  
-                    <p:commandButton value="Ok" actionListener="#{mojeRezervaceBean.zrus()}" process="@this" update="tabulkaRezervaci" oncomplete="confirmDialog.hide();rezDialog.hide()"/>
+                    <p:commandButton value="Ok" actionListener="#{mojeRezervaceBean.deleteReservation()}" process="@this" update="tabulkaRezervaci" oncomplete="confirmDialog.hide();rezDialog.hide()"/>
                     <p:commandButton value="Cancel" oncomplete="confirmDialog.hide()"/>
                 </h:panelGrid>
             </p:dialog>

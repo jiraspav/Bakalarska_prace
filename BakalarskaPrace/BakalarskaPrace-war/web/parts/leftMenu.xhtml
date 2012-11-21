@@ -13,7 +13,7 @@
                 <p:menuitem value="#{msgs.menuMistnostiVytvoreniRezervace}" action="#{navigationBean.toVytvoreniRezervacePage()}" ajax="false"/>  
                 <p:menuitem value="#{msgs.menuMistnostiNajitMistnost}" action="#{navigationBean.toVolneMistnostiPage()}" ajax="false"/>
             </p:submenu>  
-            <p:submenu label="#{msgs.menuAdmin}" icon="ui-icon-extlink" rendered="#{LoginVerifier.isAdmin()}">  
+            <p:submenu label="#{msgs.menuAdmin}" icon="ui-icon-extlink" rendered="#{sessionHolder.isLoggedUserAdmin()}">  
                 <p:menuitem value="#{msgs.menuAdminAktualizaceDat}" action="#{navigationBean.toAdminPage()}" ajax="false"/>
                 <p:menuitem value="#{msgs.menuAdminSprávaÚctu}" action="#{navigationBean.toAdminAccountEditor()}" ajax="false"/>
             </p:submenu>  

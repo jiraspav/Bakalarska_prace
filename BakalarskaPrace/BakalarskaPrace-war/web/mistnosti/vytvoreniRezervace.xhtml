@@ -24,18 +24,18 @@
                             </p:treeNode>  
                         </p:tree>  
                     </p:scrollPanel>
-                    <p:commandButton value="Aktualizovat" actionListener="#{vytvoreniRezervaceBean.smazRoot()}" process="@parent" update="scroll"/>
+                    <p:commandButton value="#{msgs.vytvoreniRezervaceButtUpdate}" actionListener="#{vytvoreniRezervaceBean.smazRoot()}" process="@parent" update="scroll"/>
 
                 </p:panelGrid >
                 <p:panel id="rozvrhyMistnosti">
                     <p:scrollPanel mode="native">
                         <p:dataTable var="rozvrh" value="#{vytvoreniRezervaceBean.rozvrhyMistnosti}">
 
-                            <f:facet name="header">Rozvrhy mistnosti</f:facet>
+                            <f:facet name="header">#{msgs.vytvoreniRezervaceTableHeaderRoomSchedule}</f:facet>
 
                             <p:columnGroup type="header">  
                                 <p:row>  
-                                    <p:column colspan="1" headerText="Den"/>
+                                    <p:column colspan="1" headerText="#{msgs.vytvoreniRezervaceTableDayColl}"/>
                                     <p:column colspan="2" headerText="7:30 - 9:00" />  
                                     <p:column colspan="2" headerText="9:15 - 10:45" />  
                                     <p:column colspan="2" headerText="11:00 - 12:30" />  
@@ -73,34 +73,31 @@
                         <p:ajax event="dateSelect" listener="#{scheduleMistnostiController.onDateSelect}" update="eventDetails messages" oncomplete="eventDialog.show()" />  
 
                     </p:schedule> 
-                    <p:commandButton value="Vytvoření nové rezervace" oncomplete="eventDialog.show()"/>
-                    <p:dialog widgetVar="eventDialog" header="Vytvořit novou rezervaci" showEffect="clip" hideEffect="clip">  
+                    <p:commandButton value="#{msgs.vytvoreniRezervaceButtNewReservation}" oncomplete="eventDialog.show()"/>
+                    <p:dialog widgetVar="eventDialog" header="#{msgs.vytvoreniRezervaceDialogHeader}" showEffect="clip" hideEffect="clip">  
                         <p:messages id="rezMsgs" showDetail="true" globalOnly="true"/>
                         <h:panelGrid id="eventDetails" columns="3">  
-                            <h:outputLabel for="popis" value="Popis: "/>
+                            <h:outputLabel for="popis" value="#{msgs.vytvoreniRezervaceDialogDescript} "/>
                             <h:inputTextarea id="popis" value="#{scheduleMistnostiController.popis}"/>
                             <h:outputText/>
-                            <h:outputLabel for="mistnost" value="Místnost: " />  
+                            <h:outputLabel for="mistnost" value="#{msgs.vytvoreniRezervaceDialogRoom} " />  
                             <h:outputText id="mistnost" value="#{vytvoreniRezervaceBean.selectedNode}"/>
                             <h:outputText/>
-                            <h:outputLabel for="datum" value="Datum:" />  
+                            <h:outputLabel for="datum" value="#{msgs.vytvoreniRezervaceDialogDate}" />  
                             <p:calendar value="#{scheduleMistnostiController.event.startDate}" id="datum" required="true"/>
                             <p:message for="datum" display="icon"/>
-                            <h:outputText  value="Od cas: " />  
+                            <h:outputText  value="#{msgs.vytvoreniRezervaceDialogTimeFrom} " />  
                             <p:calendar value="#{scheduleMistnostiController.casOd}" id="casOd" pattern="HH:mm" timeOnly="true" required="true"/>
                             <p:message for="casOd" display="icon"/>
-                            <h:outputText  value="Do cas: " />  
+                            <h:outputText  value="#{msgs.vytvoreniRezervaceDialogTimeTo} " />  
                             <p:calendar value="#{scheduleMistnostiController.casDo}" id="casDo" pattern="HH:mm" timeOnly="true" />
                             <p:message for="casDo" display="icon"/>
-                            <h:outputLabel for="naCelouMistnost" value="Na celou místnost: " />  
+                            <h:outputLabel for="naCelouMistnost" value="#{msgs.vytvoreniRezervaceDialogWholeRoomRes} " />  
                             <p:selectBooleanCheckbox id="naCelouMistnost" value="#{scheduleMistnostiController.naCelouMistnost}"  />
                             <h:outputText/>
                         </h:panelGrid>
                         
-                            
-
-
-                        <p:commandButton value="Zarezervuj" actionListener="#{scheduleMistnostiController.addEvent}" oncomplete="myschedule.update();" update="eventDetails rezMsgs" ajax="true"/>  
+                        <p:commandButton value="#{msgs.vytvoreniRezervaceDialogButtReservate}" actionListener="#{scheduleMistnostiController.addEvent()}" oncomplete="myschedule.update();" update="eventDetails rezMsgs" ajax="true"/>  
                           
                     </p:dialog>  
                 </p:panel>

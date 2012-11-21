@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Rozvrhy.findByDo1", query = "SELECT r FROM Rozvrhy r WHERE r.do1 = :do1"),
     @NamedQuery(name = "Rozvrhy.findByLichyTyden", query = "SELECT r FROM Rozvrhy r WHERE r.lichyTyden = :lichyTyden"),
     @NamedQuery(name = "Rozvrhy.findBySudyTyden", query = "SELECT r FROM Rozvrhy r WHERE r.sudyTyden = :sudyTyden"),
-    @NamedQuery(name = "Rozvrhy.findByIDmistnosti", query = "SELECT r FROM Rozvrhy r WHERE r.iDmistnosti = :iDmistnosti"),
-    @NamedQuery(name = "Rozvrhy.findByIDmistnostiAdnu", query = "SELECT r FROM Rozvrhy r WHERE r.iDmistnosti = :iDmistnosti AND r.iDdnu = :iDdnu")})
+    @NamedQuery(name = Rozvrhy.FIND_ROZVRH_BY_MISTNOST, query = "SELECT r FROM Rozvrhy r WHERE r.iDmistnosti = :iDmistnosti"),
+    @NamedQuery(name = Rozvrhy.FIND_ROZVRH_BY_MISTNOST_DEN, query = "SELECT r FROM Rozvrhy r WHERE r.iDmistnosti = :iDmistnosti AND r.iDdnu = :iDdnu")})
 public class Rozvrhy implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -65,7 +65,8 @@ public class Rozvrhy implements Serializable {
     
     public static final String FIND_ALL = "Rozvrhy.findAll";
     public static final String FIND_ROZVRH_BY_ID = "Rozvrhy.findByIDrozvrhu";
-    
+    public static final String FIND_ROZVRH_BY_MISTNOST = "Rozvrhy.findByIDmistnosti";
+    public static final String FIND_ROZVRH_BY_MISTNOST_DEN = "Rozvrhy.findByIDmistnostiAdnu";
     
     public Rozvrhy() {
     }

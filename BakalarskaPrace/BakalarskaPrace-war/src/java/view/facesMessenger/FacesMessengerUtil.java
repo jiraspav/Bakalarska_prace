@@ -23,6 +23,10 @@ public class FacesMessengerUtil {
         FacesMessage fMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "" ,message) ;
         addMessage(fMessage);
     }
+    public void addFacesMsgFatal(String message){
+        FacesMessage fMessage = new FacesMessage(FacesMessage.SEVERITY_FATAL, "" ,message) ;
+        addMessage(fMessage);
+    }
     
     private void addMessage(FacesMessage message) {
         FacesContext.getCurrentInstance().addMessage(null, message);

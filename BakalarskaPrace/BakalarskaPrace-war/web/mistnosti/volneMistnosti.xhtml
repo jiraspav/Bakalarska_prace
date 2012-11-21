@@ -12,34 +12,34 @@
 
                 <p:growl showDetail="true" id="messages"/>
                 <h:panelGrid columns="1" style="margin-bottom:10px">
-                    <p:panel id="od" header="OD">
+                    <p:panel id="od" header="#{msgs.volneMistnostiHeaderOD}">
                         <h:panelGrid columns="2">
-                            <p:calendar value="#{volneMistnostiBean.casOdVolne}" pattern="HH:mm" id="casOdVolne" timeOnly="true" required="true" requiredMessage="Start time required">
+                            <p:calendar value="#{volneMistnostiBean.casOdVolne}" pattern="HH:mm" id="casOdVolne" timeOnly="true" required="true" requiredMessage="#{msgs.volneMistnostiMsgRequiredOD}">
                                     <p:ajax event="blur" update="msgCasOdVolne"/>
                                     <p:ajax event="dateSelect" update="msgCasOdVolne"/>
                             </p:calendar>
                             <p:message id="msgCasOdVolne" for="casOdVolne"/>
                         </h:panelGrid>
                     </p:panel>
-                    <p:panel id="do" header="DO">
+                    <p:panel id="do" header="#{msgs.volneMistnostiHeaderDO}">
                         <h:panelGrid columns="2">
-                            <p:calendar value="#{volneMistnostiBean.casDoVolne}" pattern="HH:mm" id="casDoVolne" timeOnly="true" required="true" requiredMessage="End time required">
+                            <p:calendar value="#{volneMistnostiBean.casDoVolne}" pattern="HH:mm" id="casDoVolne" timeOnly="true" required="true" requiredMessage="#{msgs.volneMistnostiMsgRequiredDO}">
                                 <p:ajax id="ajaxCasDoVolne" event="blur" update="msgCasDoVolne"/>
                                 <p:ajax id="ajaxCasDoVolne" event="dateSelect" update="msgCasDoVolne"/>
                             </p:calendar>
                             <p:message id="msgCasDoVolne" for="casDoVolne"/>
                         </h:panelGrid>
                     </p:panel>
-                    <p:panel header="Datum">
+                    <p:panel header="#{msgs.volneMistnostiTableHeaderDatum}">
                         <h:panelGrid columns="2">
-                            <p:calendar value="#{volneMistnostiBean.datumVolne}" pattern="dd.MM.yyyy" id="datumVolne" required="true" requiredMessage="Date required">
+                            <p:calendar value="#{volneMistnostiBean.datumVolne}" pattern="dd.MM.yyyy" id="datumVolne" required="true" requiredMessage="#{msgs.volneMistnostiMsgRequiredDate}">
                                 <p:ajax event="blur" update="msgDatumVolne"/>
                                 <p:ajax event="dateSelect" update="msgDatumVolne"/>
                             </p:calendar>
                             <p:message id="msgDatumVolne" for="datumVolne"/>
                         </h:panelGrid>
                     </p:panel>
-                    <p:commandButton value="Najdi" actionListener="#{volneMistnostiBean.update()}" update=":frm:volneMistnosti :frm:messages" process="@parent"/>
+                    <p:commandButton value="#{msgs.volneMistnostiButtFind}" actionListener="#{volneMistnostiBean.update()}" update=":frm:volneMistnosti :frm:messages" process="@parent"/>
                 </h:panelGrid>
 
 
@@ -53,10 +53,10 @@
                             <h:outputText value="#{msgs.volneMistnosti}"/>
                         </f:facet>  
 
-                        <p:column headerText="Lokalita" sortBy="#{volne.zkratka}" filterBy="#{volne.zkratka}" filterMatchMode="contains">  
+                        <p:column headerText="#{msgs.volneMistnostiTableHeaderLokal}" sortBy="#{volne.zkratka}" filterBy="#{volne.zkratka}" filterMatchMode="contains">  
                             <h:outputText value="#{volne.zkratka}"/>
                         </p:column>  
-                        <p:column headerText="Středisko" sortBy="#{volne.getIDstrediska().nazev}" filterBy="#{volne.getIDstrediska().nazev}" filterMatchMode="contains">  
+                        <p:column headerText="#{msgs.volneMistnostiTableHeaderStred}" sortBy="#{volne.getIDstrediska().nazev}" filterBy="#{volne.getIDstrediska().nazev}" filterMatchMode="contains">  
                             <h:outputText value="#{volne.getIDstrediska().nazev}"/>
                         </p:column>
 

@@ -33,8 +33,11 @@ public class RozvrhyFacade extends AbstractFacade<Rozvrhy> {
         super(Rozvrhy.class);
     }
 
-    public void findByMistnost(Mistnost mistnost) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public List<Rozvrhy> findByMistnost(Mistnost mistnost) {
+        Query qr = em.createNamedQuery("Rozvrhy.findByIDmistnostiAdnu");
+        qr.setParameter("iDmistnosti", mistnost);
+        
+        return qr.getResultList();
     }
 
     public List<Rozvrhy> findByMistnostAden(Mistnost mistnost, DenVTydnu denVTydnu) {

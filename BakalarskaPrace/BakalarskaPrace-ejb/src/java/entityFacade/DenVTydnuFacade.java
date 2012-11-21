@@ -36,7 +36,7 @@ public class DenVTydnuFacade extends AbstractFacade<DenVTydnu> {
     public DenVTydnu getDenByNazev(String nazev){
         String prelozeno = null;
         for(int i = 0;i<translator.length; i++){
-            if(translator[i].equals(nazev)){
+            if(translator[i].equalsIgnoreCase(nazev)){
                 prelozeno = translator[i+1];
                 break;
             }
@@ -46,7 +46,7 @@ public class DenVTydnuFacade extends AbstractFacade<DenVTydnu> {
             qr.setParameter("nazev", prelozeno);
             return (DenVTydnu) qr.getSingleResult();
         }catch(NoResultException e){
-            return new DenVTydnu(new Integer(8));
+            return getDenByCeskyNazev("Neznámý");
         }
     }
     public DenVTydnu getDenByCeskyNazev(String nazev){
@@ -55,7 +55,7 @@ public class DenVTydnuFacade extends AbstractFacade<DenVTydnu> {
             qr.setParameter("nazev", nazev);
             return (DenVTydnu) qr.getSingleResult();
         }catch(NoResultException e){
-            return new DenVTydnu(new Integer(8));
+            return getDenByCeskyNazev("Neznámý");
         }
     }
     

@@ -35,5 +35,9 @@ public class StrediskoOperator {
     public void deleteAll(){
         stredFac.removeAll();
     }
+    /*public List<Stredisko> getStrediska(){
+        
+    }*/
+    
 }
 

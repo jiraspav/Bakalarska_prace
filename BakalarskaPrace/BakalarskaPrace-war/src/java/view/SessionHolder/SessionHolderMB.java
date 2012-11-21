@@ -51,6 +51,11 @@ public class SessionHolderMB implements Serializable {
         password = null;
     }
     
+    
+    public boolean isLoggedUserAdmin(){
+        return uzivOper.isAdmin(loggedIn);
+    }
+    
     public String getLoggedUzivatelName(){
         return uzivOper.getUzivatelName(loggedIn);
     }
