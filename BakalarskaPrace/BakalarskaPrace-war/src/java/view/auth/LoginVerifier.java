@@ -6,6 +6,7 @@ package view.auth;
 
 import app.encrypt.EncryptUtil;
 import app.facade.login.LoginFacade;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,15 +53,15 @@ public class LoginVerifier implements Serializable{
      */
     public String login(){
         
-        session.saveNewSession(login, password);
+        
         
         FacesContext ctx = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) ctx.getExternalContext().getRequest();
         
         if(request.getUserPrincipal() == null){
             try {
-                request.login(login, encrypt.SHA256(password));
-                
+                request.login(login, Base64.encode(password.getBytes()));
+                session.saveNewSession(login, password);
                 
             } catch (ServletException ex) {
 

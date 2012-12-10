@@ -18,7 +18,6 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "mistnost")
-@XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Mistnost.findAll", query = "SELECT m FROM Mistnost m"),
     @NamedQuery(name = "Mistnost.findByIDmistnosti", query = "SELECT m FROM Mistnost m WHERE m.iDmistnosti = :iDmistnosti"),
@@ -36,6 +35,10 @@ public class Mistnost implements Serializable {
     @Size(min = 1, max = 16)
     @Column(name = "zkratka")
     private String zkratka;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "kapacita")
+    private int kapacita;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "iDmistnosti")
     private Collection<RezervaceMistnosti> rezervaceMistnostiCollection;
     @JoinColumn(name = "ID_strediska", referencedColumnName = "ID_stredisko")
@@ -43,7 +46,9 @@ public class Mistnost implements Serializable {
     private Stredisko iDstrediska;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "iDmistnosti")
     private Collection<Rozvrhy> rozvrhyCollection;
-    
+    @JoinColumn(name = "ID_typ", referencedColumnName = "ID_typ_mistnosti")
+    @ManyToOne(optional = false)
+    private TypMistnosti iDtyp;
 
     public Mistnost() {
     }
@@ -126,6 +131,34 @@ public class Mistnost implements Serializable {
     @Override
     public String toString() {
         return "dbEntity.Mistnost[ iDmistnosti=" + iDmistnosti + " ]";
+    }
+
+    /**
+     * @return the kapacita
+     */
+    public int getKapacita() {
+        return kapacita;
+    }
+
+    /**
+     * @param kapacita the kapacita to set
+     */
+    public void setKapacita(int kapacita) {
+        this.kapacita = kapacita;
+    }
+
+    /**
+     * @return the iDtyp
+     */
+    public TypMistnosti getiDtyp() {
+        return iDtyp;
+    }
+
+    /**
+     * @param iDtyp the iDtyp to set
+     */
+    public void setiDtyp(TypMistnosti iDtyp) {
+        this.iDtyp = iDtyp;
     }
     
 }

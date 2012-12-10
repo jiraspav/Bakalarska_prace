@@ -18,20 +18,19 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "rezervace_mistnosti")
-@XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "RezervaceMistnosti.findAll", query = "SELECT r FROM RezervaceMistnosti r"),
     @NamedQuery(name = "RezervaceMistnosti.findByIDrezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDrezervace = :iDrezervace"),
-    @NamedQuery(name = "RezervaceMistnosti.findByDatumRezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.datumRezervace = :datumRezervace"),
-    @NamedQuery(name = "RezervaceMistnosti.findByOd", query = "SELECT r FROM RezervaceMistnosti r WHERE r.od = :od"),
-    @NamedQuery(name = "RezervaceMistnosti.findByDo1", query = "SELECT r FROM RezervaceMistnosti r WHERE r.do1 = :do1"),
-    @NamedQuery(name = "RezervaceMistnosti.findByNaCelouMistnost", query = "SELECT r FROM RezervaceMistnosti r WHERE r.naCelouMistnost = :naCelouMistnost"),
-    @NamedQuery(name = "RezervaceMistnosti.findByIDuser", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDuser = :iDuser"),
-    @NamedQuery(name = "RezervaceMistnosti.findByIDmistnosti", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti")})
+    @NamedQuery(name = "RezervaceMistnosti.findByDatumRezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.datumRezervace = :datumRezervace AND r.status = :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByOd", query = "SELECT r FROM RezervaceMistnosti r WHERE r.od = :od AND r.status = :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByDo1", query = "SELECT r FROM RezervaceMistnosti r WHERE r.do1 = :do1 AND r.status = :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByIDuser", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDuser = :iDuser AND r.status = :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByIDmistnosti", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.status = :status"),
+    @NamedQuery(name = RezervaceMistnosti.FIND_BY_MISTNOST_A_DEN, query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.datumRezervace = :datumRezervace AND r.status = :status")})
 public class RezervaceMistnosti implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID_rezervace")
@@ -53,14 +52,19 @@ public class RezervaceMistnosti implements Serializable {
     private Date do1;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "na_celou_mistnost")
-    private boolean naCelouMistnost;
+    @Column(name = "rezervovanychMist")
+    private int pocetRezervovanychMist;
     @Basic(optional = false)
-    @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "popis")
     private String popis;
+    @Basic(optional = false)
+    @NotNull
+    @Lob
+    @Size(min = 1, max = 65535)
+    @Column(name = "status")
+    private String status;
     @JoinColumn(name = "ID_user", referencedColumnName = "ID_user")
     @ManyToOne(optional = false)
     private Uzivatel iDuser;
@@ -68,6 +72,11 @@ public class RezervaceMistnosti implements Serializable {
     @ManyToOne(optional = false)
     private Mistnost iDmistnosti;
 
+    
+    public static final String FIND_BY_MISTNOST_A_DEN = "RezervaceMistnosti.findByIDmistnostiIDden";
+    
+    
+    
     public RezervaceMistnosti() {
     }
 
@@ -75,23 +84,28 @@ public class RezervaceMistnosti implements Serializable {
         this.iDrezervace = iDrezervace;
     }
 
-    public RezervaceMistnosti(Integer iDrezervace, Date datumRezervace, Date od, Date do1, boolean naCelouMistnost, String popis) {
-        this.iDrezervace = iDrezervace;
+    public RezervaceMistnosti(Date datumRezervace, Date od, Date do1) {
         this.datumRezervace = datumRezervace;
         this.od = od;
         this.do1 = do1;
-        this.naCelouMistnost = naCelouMistnost;
+    }
+    public RezervaceMistnosti(Date datumRezervace, Date od, Date do1, int pocetMist, String popis) {
+        this.datumRezervace = datumRezervace;
+        this.od = od;
+        this.do1 = do1;
+        this.pocetRezervovanychMist = pocetMist;
         this.popis = popis;
     }
 
-    public RezervaceMistnosti(Uzivatel uziv, Mistnost mistnost,Date datumRezervace, Date od, Date do1, boolean naCelouMistnost, String popis) {
+    public RezervaceMistnosti(Uzivatel uziv, Mistnost mistnost,Date datumRezervace, Date od, Date do1, int pocetMist, String popis, String status) {
         this.iDuser = uziv;
         this.iDmistnosti = mistnost;
         this.datumRezervace = datumRezervace;
         this.od = od;
         this.do1 = do1;
-        this.naCelouMistnost = naCelouMistnost;
+        this.pocetRezervovanychMist = pocetMist;
         this.popis = popis;
+        this.status = status;
     }
     
     public Integer getIDrezervace() {
@@ -141,14 +155,6 @@ public class RezervaceMistnosti implements Serializable {
         this.do1 = do1;
     }
 
-    public boolean getNaCelouMistnost() {
-        return naCelouMistnost;
-    }
-
-    public void setNaCelouMistnost(boolean naCelouMistnost) {
-        this.naCelouMistnost = naCelouMistnost;
-    }
-
     public String getPopis() {
         return popis;
     }
@@ -196,6 +202,34 @@ public class RezervaceMistnosti implements Serializable {
     @Override
     public String toString() {
         return "dbEntity.RezervaceMistnosti[ iDrezervace=" + iDrezervace + " ]";
+    }
+
+    /**
+     * @return the pocetRezervovanychMist
+     */
+    public int getPocetRezervovanychMist() {
+        return pocetRezervovanychMist;
+    }
+
+    /**
+     * @param pocetRezervovanychMist the pocetRezervovanychMist to set
+     */
+    public void setPocetRezervovanychMist(int pocetRezervovanychMist) {
+        this.pocetRezervovanychMist = pocetRezervovanychMist;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }

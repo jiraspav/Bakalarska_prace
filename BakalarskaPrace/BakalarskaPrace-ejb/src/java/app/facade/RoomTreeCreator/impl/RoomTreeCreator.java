@@ -11,7 +11,6 @@ import dbEntity.Mistnost;
 import dbEntity.Stredisko;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -33,18 +32,20 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
     @Override
     public TreeNode createRoomTree(TreeNode root) {
         
-        if(root == null){
-
+        
+            //System.out.println("Root not null");
             //creates one default TreeNode named "CVUT"
-            TreeNode cvut = createDefaultTree();
-
+            
+            TreeNode cvut = new DefaultTreeNode("ČVUT", root);
+            cvut.setSelectable(false);
+            
             List<Stredisko> allStrediska = stredOper.getAll();
 
 
             Collections.sort(allStrediska, new StrediskoComparator());
 
             for(Stredisko curr : allStrediska){
-
+                //System.out.println("FOR stredisko: "+curr.getNazev());
                 //get all shortnames of all Mistnost from one Stredisko
                 List<String> zkratky = getShortNames(mistOper.getMistnosti(curr));
 
@@ -53,20 +54,19 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
                     
                     Collections.sort(zkratky);
 
-                    TreeNode nodeStr = new DefaultTreeNode(curr.getNazev(), cvut);  
+                    TreeNode nodeStr = linkAllToNode(curr.getNazev(), cvut ,zkratky);
                     nodeStr.setSelectable(false);
-                    
+                    nodeStr.setParent(cvut);
                     //add all Mistnosti for each Stredisko
-                    linkAllToNode(nodeStr, zkratky);
+                    
                 }
             }
-        }
+        
         return root;  
     }
     
-    private TreeNode createDefaultTree(){
+    private TreeNode createDefaultTree(TreeNode root){
         
-        TreeNode root = new DefaultTreeNode("Root", null);  
         TreeNode cvut = new DefaultTreeNode("ČVUT", root);
         cvut.setSelectable(false);
         
@@ -78,16 +78,21 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
         List<String> zkratky = new ArrayList<String>();
         
         for (Mistnost mistnost : mistnosti) {
+            //System.out.println("Mistnost "+mistnost.getZkratka());
             zkratky.add(mistnost.getZkratka());
         }
         
         return zkratky;
     }
     
-    private void linkAllToNode(TreeNode node, List<String> strings){
+    private TreeNode linkAllToNode(String data , TreeNode parent , List<String> strings){
+        
+        TreeNode node = new DefaultTreeNode(data,parent);
         for(String current : strings){
             TreeNode addedNode = new DefaultTreeNode(current, node);
         }
+        
+        return node;
     }
     
 }

@@ -4,48 +4,65 @@
  */
 package app.sessionHolder;
 
+import app.baseDataOperators.UzivatelOperator;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import dbEntity.Uzivatel;
 import entityFacade.UzivatelFacade;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.LocalBean;
 import javax.ejb.Remove;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.context.FacesContext;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 /**
  *
  * @author Pavel
  */
 
-@Stateful
-public class SessionHolderEJB implements Serializable {
+@Stateless
+public class SessionHolderEJB {
     
-    private Uzivatel loggedIn;
-    private String password;
+    private @Inject UzivatelOperator uzivOper;
     
-    private @Inject UzivatelFacade uzivFac;
-    
-    public void saveNewSession(Uzivatel uziv, String pass){
-        loggedIn = uziv;
-        password = pass;
-    }
-    
-    @Remove
-    public void killSession(){
-        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();  
-        password = null;
-    }
     
     
     public String getLoggedUzivatelLogin(){
-        return loggedIn.getLogin();
+        return getLoggedName();
     }
     public Uzivatel getLoggedUzivatel(){
-        return loggedIn;
+         
+        System.out.println("Named : "+getLoggedName());
+        
+        return uzivOper.getUzivatel(getLoggedName());
     }
     public String getPassword(){
-        return password;
+        //System.out.println("Password : "+getLoggedPassword());
+        return getLoggedPassword();
+    }
+    
+    private String getLoggedPassword(){
+        String pass = getLoggedUzivatel().getHeslo();
+        return new String(Base64.decode(pass));
+    }
+    
+    private String getLoggedName(){
+        return getSessionContext().getCallerPrincipal().getName();
+    }
+    
+    private SessionContext getSessionContext(){
+        SessionContext sctxLookup = null;
+        try {
+            InitialContext ic = new InitialContext();
+            sctxLookup = (SessionContext) ic.lookup("java:comp/EJBContext");
+        } catch (NamingException ex) {
+            Logger.getLogger(SessionHolderEJB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return sctxLookup;
     }
 }

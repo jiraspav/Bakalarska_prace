@@ -5,6 +5,7 @@
 package app.XMLparser;
 
 
+import app.DataCreator.DataCreator;
 import app.baseDataOperators.*;
 import app.sessionHolder.SessionHolderEJB;
 import dbEntity.*;
@@ -154,15 +155,20 @@ public class Parser implements Serializable{
                     NodeList childs = current.getChildNodes();
                     for(int b = 0; b < childs.getLength(); b++){
                         Node node = childs.item(b);
-                        if(node.getNodeName().equals("code"))
+                        if(node.getNodeName().equals("code")){
                             code = node.getTextContent();
+                        }
                         
-                        if(node.getNodeName().equals("department"))
+                        if(node.getNodeName().equals("department")){
                             department = (Long.parseLong(((Element)node).getAttribute("id")));
+                        }
                         
                     }
                     
-                    misOper.createMistnost(id,code,new Stredisko(department));
+                    //T2:C4-156 doesnt have department
+                    if(!code.equals("T2:C4-156")){
+                        misOper.createMistnost(id,code,new Stredisko(department));
+                    }
                     
                 }
                 
@@ -256,15 +262,19 @@ public class Parser implements Serializable{
                     
                     
                     //informace o jednotlivych paralelkach
-                    String den = null,od = null,do1 = null,parita = null,urlPredmetu = null;
+                    
                     if(nodeList2.getLength() > 0){
                         for(int a = 0; a<nodeList2.getLength(); a++){
-
+                            
+                            String den = null,od = null,do1 = null,parita = null,urlPredmetu = null;
+                            Long idRozvrhu = null;
 
                             Node current2 = nodeList2.item(a);
 
                             Element currParalelka = (Element) current2;
-
+                            
+                            idRozvrhu = Long.parseLong(currParalelka.getAttribute("id"));
+                            
                             urlPredmetu = currParalelka.getAttribute("uri");
 
                             String split[] = urlPredmetu.split("instances");
@@ -325,7 +335,7 @@ public class Parser implements Serializable{
                                 sudy = true;
                             }
                             
-                            rozOper.createRozvrh(new Long(1),denFac.getDenByNazev(den),new Mistnost(idMistnosti),
+                            rozOper.createRozvrh(idRozvrhu,denFac.getDenByNazev(den),new Mistnost(idMistnosti),
                                             new Predmety(idPredmetu),doDate,odDate,lichy,sudy);
                             
                         }

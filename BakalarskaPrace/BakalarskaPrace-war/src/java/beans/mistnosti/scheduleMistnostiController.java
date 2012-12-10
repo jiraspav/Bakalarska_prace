@@ -7,28 +7,13 @@ package beans.mistnosti;
 import app.baseDataOperators.MistnostOperator;
 import app.facade.reservationEditor.ReservationEditorFacade;
 import app.facade.schedulerEditorPF.SchedulerEditorPFFacade;
-import view.auth.LoginVerifier;
-import beans.mistnosti.VytvoreniRezervaceBean;
-import dbEntity.*;
-import entityFacade.DenVTydnuFacade;
-import entityFacade.GroupTableFacade;
-import entityFacade.MistnostFacade;
-import entityFacade.RezervaceMistnostiFacade;
-import entityFacade.RozvrhyFacade;
-import entityFacade.UzivatelFacade;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.TimeZone;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.event.DateSelectEvent;
-import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
-import org.primefaces.event.ScheduleEntrySelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
@@ -49,7 +34,7 @@ public class scheduleMistnostiController implements Serializable {
     @Inject private SchedulerEditorPFFacade schedFac;
     @Inject private FacesMessengerUtil facUtil;
     @Inject private ResourceBundleOperator bundle;
-    @Inject private VytvoreniRezervaceBean vytBean;
+    @Inject private VytvoreniRezervaceMB vytBean;
     @Inject private SessionHolderMB session;
     @Inject private MistnostOperator mistOper;
     
@@ -75,7 +60,7 @@ public class scheduleMistnostiController implements Serializable {
      * metoda pro přidávání eventů do schedule modelu (nových rezervací)
      * @param actionEvent
      */
-    public void addEvent(ActionEvent actionEvent) {
+    public void addEvent() {
         
         if(vytBean.getSelectedNode() == null){
             facUtil.addFacesMsgError(bundle.getMsg("sysMsgNoRoomSellected"));
@@ -91,9 +76,9 @@ public class scheduleMistnostiController implements Serializable {
                 
 
                 if(response.equals("ok")){
-                    
-                        resFac.createReservation(session.getLoggedUzivatel(), mistOper.getMistnost(mistShort), event.getStartDate(), casOd, casDo, naCelouMistnost, popis);
-                    
+                        //JE NUTNE PRIDAT MOZNOST VYBERU MNOZSTVI MIST
+                        //resFac.createReservation(mistOper.getMistnost(mistShort), event.getStartDate(), casOd, casDo, naCelouMistnost, 5, popis);
+                        //
                         getEventModel().addEvent(getEvent());
                         
                         facUtil.addFacesMsgInfo(bundle.getMsg("sysMsgSuccReserved"));
@@ -117,10 +102,10 @@ public class scheduleMistnostiController implements Serializable {
 
     /**
      * ActionListener pro schedule komponentu
-     * @param selectEvent
+     * @param e
      */
-    public void onDateSelect(DateSelectEvent selectEvent) {
-        setEvent(new DefaultScheduleEvent("", selectEvent.getDate(), selectEvent.getDate()));
+    public void onDateSelect(DateSelectEvent e) {
+        setEvent(new DefaultScheduleEvent("", e.getDate(), e.getDate()));
         
     }
 
@@ -128,7 +113,6 @@ public class scheduleMistnostiController implements Serializable {
      * @return the eventModel
      */
     public ScheduleModel getEventModel() {
-        eventModel.clear();
         
         eventModel = schedFac.createNewModel(vytBean.getSelectedNode());
         

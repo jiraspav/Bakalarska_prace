@@ -10,16 +10,17 @@ import app.baseDataOperators.RezervaceMistnostiOperator;
 import app.baseDataOperators.RozvrhyOperator;
 import app.baseDataOperators.UzivatelOperator;
 import app.facade.reservationEditor.ReservationEditorFacade;
+import app.facade.roomFinder.RoomFinderFacade;
 import app.sessionHolder.SessionHolderEJB;
+import app.sweeper.Sweeper;
 import dbEntity.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
-import javax.faces.model.DataModel;
-import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 
 /**
@@ -37,10 +38,57 @@ public class ReservationEditor implements ReservationEditorFacade{
     private @Inject DnyVTydnuOperator denOper;
     private @Inject UzivatelOperator uzivOper;
     private @Inject MistnostOperator mistOper;
-
+    private @Inject RoomFinderFacade roomFac;
+    private @Inject Sweeper sweeper;
+    
     @Override
-    public void createReservation(Uzivatel uziv, Mistnost mistnost, Date startDate, Date casOd, Date casDo, boolean naCelouMistnost, String popis) {
-        rezOper.createRezervaceMistnosti(uziv, mistnost, startDate, casOd, casDo, naCelouMistnost, popis);
+    public void createAllReservations(Mistnost mistnost, List<RezervaceMistnosti> preparedReservations){
+        //PRO KAZDOU PREPARED NAJIT REZERVACE NA STEJNY DEN A MISTNOST
+        //NAJIT TY KTERE SE PREKRYVAJI
+        //U TECH KAM SE PREPARED NEVEJDOU A ZAROVEN JE PREPARED VYSSI PRIORITA NASTAVIT STATUS OVERWRITEN
+        for(RezervaceMistnosti rez : preparedReservations){
+            rez.setIDmistnosti(mistnost);
+            
+            ArrayList<RezervaceMistnosti> interfering = new ArrayList<RezervaceMistnosti>();
+            List<RezervaceMistnosti> rezervace = rezOper.getRezervace(rez.getDatumRezervace(), mistnost);
+            
+            for(RezervaceMistnosti temp : rezervace){
+                System.out.println("RESERVATION: mistnost - "+temp.getIDmistnosti().getZkratka()+" datum - "+temp.getDatumRezervace()+" od - "+temp.getOd()+" do - "+temp.getDo1()+" pocet - "+temp.getPocetRezervovanychMist()+" popis - "+temp.getPopis());
+                if(temp.getStatus().equals("OVERWRITTEN")){
+                    System.out.println("ALERT ALERT STATUS BREACH!!!");
+                }
+                if(roomFac.isInterfering(rez, temp)){
+                    interfering.add(temp);
+                }
+            }
+            
+            ArrayList<RezervaceMistnosti> overwritten = sweeper.getOverwrittenReservations(rez, interfering);
+            //RESERVATION STATUS SWITCH HANDLER
+            for(RezervaceMistnosti temp : overwritten){
+                rezOper.changeStatusToOverWritten(temp);
+            }
+            
+            
+            
+            this.createReservation(mistnost, rez.getDatumRezervace(), rez.getOd(), rez.getDo1(), rez.getPocetRezervovanychMist(), rez.getPopis());
+            sweeper.RESET_VALUES();
+        }
+    }
+
+    private ArrayList<RezervaceMistnosti> getLowerPriorityReservations(ArrayList<RezervaceMistnosti> reservations){
+        
+        ArrayList<RezervaceMistnosti> reservationsCache = new ArrayList<RezervaceMistnosti>(reservations);
+        
+        for(RezervaceMistnosti res: reservations){
+            if(sweeper.isHigherPriorityThanLogged(res)){
+                reservationsCache.remove(res);
+            }
+        }
+        return reservationsCache;
+    }
+    @Override
+    public void createReservation(Mistnost mistnost, Date startDate, Date casOd, Date casDo, int pocetMist , String popis) {
+        rezOper.createRezervaceMistnosti(session.getLoggedUzivatel(), mistnost, startDate, casOd, casDo, pocetMist, popis);
     }
         
     @Override
@@ -54,9 +102,9 @@ public class ReservationEditor implements ReservationEditorFacade{
     }
 
     @Override
-    public DataModel getReservationsOfLoggedUser() {
+    public List<RezervaceMistnosti> getReservationsOfLoggedUser() {
         Uzivatel user = session.getLoggedUzivatel();
-        return new ListDataModel(rezOper.getRezervace(user)) ;
+        return rezOper.getRezervace(user);
     }
 
     @Override
@@ -72,9 +120,9 @@ public class ReservationEditor implements ReservationEditorFacade{
                     
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE",Locale.ENGLISH);
 
-        DenVTydnu denRezervace = denOper.getCZDen(sdf.format(editDateOfReservation));
+        DenVTydnu denRezervace = denOper.getENDen(sdf.format(editDateOfReservation));
 
-        ArrayList<RezervaceMistnosti> rezervaceMistnosti = new ArrayList(rezOper.getRezervace(selectedRow.getIDmistnosti()));
+        ArrayList<RezervaceMistnosti> rezervaceMistnosti = new ArrayList(rezOper.getRezervace(editDateOfReservation, selectedRow.getIDmistnosti()));
         ArrayList<Rozvrhy> rozvrhyMistnosti = new ArrayList(rozOper.getRozvrhy(selectedRow.getIDmistnosti(), denRezervace));
 
 
@@ -89,20 +137,13 @@ public class ReservationEditor implements ReservationEditorFacade{
 
 
         //checks all made reservations on this room
+        //DEFAULT VALUES NEEDS TO BE REWRITED
+        RezervaceMistnosti curr = new RezervaceMistnosti(editDateOfReservation, editDateFrom, editDateTo, 0, "") ;
 
-        for(RezervaceMistnosti rez : rezervaceMistnosti){
-
-            //are reservations of same date?
-            if(editDateOfReservation.equals(rez.getDatumRezervace())){
-                //are they interfering with each other?
-                if(!((editDateFrom.after(rez.getDo1())) || (editDateTo.before(rez.getOd())))){
-                    //is role of user higher than user of older reservation?
-                    if(rez.getNaCelouMistnost() && (uzivOper.getUzivatelRolePriority(rez.getIDuser())) >= (uzivOper.getUzivatelRolePriority(session.getLoggedUzivatel()))) {
-                        return "alreadyReserved";
-                    }
-                }
-            }
+        if(!roomFac.isEnoughSpace(curr, selectedRow.getIDmistnosti())) {
+            return "alreadyReserved";
         }
+                
         return "ok";
         
     }

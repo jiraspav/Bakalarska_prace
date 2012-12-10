@@ -22,7 +22,7 @@ public class StrediskoOperator {
     public Stredisko createStredisko(Long id, Long code, String department) {
         Stredisko stredisko = new Stredisko(id, code, department);
         
-        System.out.println("Stredisko "+stredisko.getNazev());
+        System.out.println("Stredisko id:"+stredisko.getIDstredisko()+" "+stredisko.getNazev());
         
         stredFac.create(stredisko);
         

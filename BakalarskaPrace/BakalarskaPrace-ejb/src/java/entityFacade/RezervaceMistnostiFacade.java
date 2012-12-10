@@ -37,6 +37,7 @@ public class RezervaceMistnostiFacade extends AbstractFacade<RezervaceMistnosti>
     public List<RezervaceMistnosti> getRezervaceByUserID(Uzivatel user) {
         Query qr = em.createNamedQuery("RezervaceMistnosti.findByIDuser");
         qr.setParameter("iDuser", user);
+        qr.setParameter("status", "ACTIVE");
         
         return qr.getResultList();
     }
@@ -44,12 +45,22 @@ public class RezervaceMistnostiFacade extends AbstractFacade<RezervaceMistnosti>
     public List<RezervaceMistnosti> getRezervaceByMistnostID(Mistnost mistnost) {
         Query qr = em.createNamedQuery("RezervaceMistnosti.findByIDmistnosti");
         qr.setParameter("iDmistnosti", mistnost);
+        qr.setParameter("status", "ACTIVE");
         return qr.getResultList();
     }
     
     public List<RezervaceMistnosti> getRezervaceByDatum(Date datum) {
         Query qr = em.createNamedQuery("RezervaceMistnosti.findByDatumRezervace");
         qr.setParameter("datumRezervace", datum);
+        qr.setParameter("status", "ACTIVE");
+        return qr.getResultList();
+    }
+    
+    public List<RezervaceMistnosti> getRezervaceByMistnostIDandDatum(Date datum, Mistnost mistnost) {
+        Query qr = em.createNamedQuery(RezervaceMistnosti.FIND_BY_MISTNOST_A_DEN);
+        qr.setParameter("datumRezervace", datum);
+        qr.setParameter("iDmistnosti", mistnost);
+        qr.setParameter("status", "ACTIVE");
         return qr.getResultList();
     }
     

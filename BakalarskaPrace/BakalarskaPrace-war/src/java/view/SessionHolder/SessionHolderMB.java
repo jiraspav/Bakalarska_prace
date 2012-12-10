@@ -4,10 +4,9 @@
  */
 package view.SessionHolder;
 
+import app.DataCreator.DataCreator;
 import app.baseDataOperators.UzivatelOperator;
-import app.sessionHolder.SessionHolderEJB;
 import dbEntity.Uzivatel;
-import entityFacade.UzivatelFacade;
 import java.io.Serializable;
 import javax.ejb.Remove;
 import javax.enterprise.context.SessionScoped;
@@ -29,23 +28,35 @@ public class SessionHolderMB implements Serializable {
     
     
     private @Inject UzivatelOperator uzivOper;
-    private @Inject SessionHolderEJB session;
-    
+    private @Inject DataCreator creator;
     
     
     public void saveNewSession(String login, String pass){
-        session.saveNewSession(loggedIn, pass);
         
-        loggedIn = (Uzivatel) uzivOper.getUzivatel(login);
+        
+        loggedIn = uzivOper.getUzivatel(login);
         password = pass;
         
+        System.out.println(""+loggedIn.getLogin()+" : "+password);
+        
+       /* SessionHolderEJB session = null;
+        try {
+            InitialContext ic = new InitialContext();
+            session = (SessionHolderEJB) ic.lookup("SessionHolderEJB");
+            
+        } catch (NamingException ex) {
+            Logger.getLogger(SessionHolderMB.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+             
+        
+        //session.saveNewSession(loggedIn, pass);
+        //creator.initSession(login, password);
     }
     
     
     
     @Remove
     public void killSession(){
-        session.killSession();
         
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();      
         password = null;

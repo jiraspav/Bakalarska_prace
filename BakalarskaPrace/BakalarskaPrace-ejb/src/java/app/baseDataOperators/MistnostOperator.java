@@ -5,8 +5,10 @@
 package app.baseDataOperators;
 
 import dbEntity.Mistnost;
+import dbEntity.RezervaceMistnosti;
 import dbEntity.Stredisko;
 import entityFacade.MistnostFacade;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -19,14 +21,21 @@ import javax.inject.Inject;
 public class MistnostOperator {
     
     private @Inject MistnostFacade misFac;
-    
+    private @Inject TypMistnostiOperator typOper;
+    private @Inject RezervaceMistnostiOperator rezOper;
 
     public Mistnost createMistnost(Long id, String code, Stredisko stredisko) {
         
         Mistnost mistnost = new Mistnost(id, code);
         mistnost.setIDstrediska(stredisko);
         
-        System.out.println("Mistnost "+mistnost.getZkratka());
+        //DEFAULT VALUES
+        
+        mistnost.setKapacita(50);
+        mistnost.setiDtyp(typOper.getTyp("Učebna"));
+        
+        //
+        System.out.println("Mistnost "+mistnost.getZkratka()+" stredisko id: "+stredisko.getIDstredisko()+" "+stredisko.getNazev());
         
         misFac.create(mistnost);
         
@@ -42,4 +51,6 @@ public class MistnostOperator {
     public Mistnost getMistnost(String zkratka){
         return misFac.findMistnostPodleZkratky(zkratka);
     }
+
+
 }

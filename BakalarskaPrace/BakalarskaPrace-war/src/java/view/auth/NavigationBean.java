@@ -84,6 +84,9 @@ public class NavigationBean {
     public String success(){
         return "success";
     }
+    public String toAllTogether(){
+        return "alltogether";
+    }
     
     /**
      * metoda používaná pro navigace napříč stránkami.

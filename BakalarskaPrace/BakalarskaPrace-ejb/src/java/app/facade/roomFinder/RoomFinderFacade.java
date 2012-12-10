@@ -5,8 +5,7 @@
 package app.facade.roomFinder;
 
 import dbEntity.Mistnost;
-import java.util.ArrayList;
-import java.util.Date;
+import dbEntity.RezervaceMistnosti;
 import java.util.List;
 
 /**
@@ -15,6 +14,9 @@ import java.util.List;
  */
 public interface RoomFinderFacade {
     
-    public List<Mistnost> getAllFreeRooms(Date from, Date odCas, Date doCas);
+    public List<Mistnost> getAllFreeRooms(List<RezervaceMistnosti> preparedReservations);
+    public boolean isEnoughSpace(RezervaceMistnosti rez, Mistnost mist);
+    public boolean isInterfering(RezervaceMistnosti rez, List<RezervaceMistnosti> preparedReservations);
+    public boolean isInterfering(RezervaceMistnosti rez, RezervaceMistnosti rez2);
     
 }

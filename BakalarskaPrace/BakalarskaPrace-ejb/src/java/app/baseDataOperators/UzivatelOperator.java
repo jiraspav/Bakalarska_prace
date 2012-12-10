@@ -13,6 +13,7 @@ import entityFacade.UzivatelFacade;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  *
@@ -39,9 +40,21 @@ public class UzivatelOperator {
     
     public void buildDefaultUzivatel(){
         
-        Uzivatel uziv = createUzivatel(1, "superadmin", crypt.SHA256("admin"), "Default administrátor");
+        Uzivatel uziv = createUzivatel(1, "superadmin", Base64.encode(("admin").getBytes()), "Default administrátor");
 
         GroupTable groupTab = new GroupTable("superadmin","admin");
+
+        groupFac.create(groupTab);
+        
+        uziv = createUzivatel(2, "testucitel", Base64.encode(("admin").getBytes()), "Default učitel");
+
+        groupTab = new GroupTable("testucitel","ucitel");
+
+        groupFac.create(groupTab);
+        
+        uziv = createUzivatel(3, "teststudent", Base64.encode(("admin").getBytes()), "Default student");
+
+        groupTab = new GroupTable("teststudent","student");
 
         groupFac.create(groupTab);
     }

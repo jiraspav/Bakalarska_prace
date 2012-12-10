@@ -7,7 +7,9 @@ package beans.mistnosti;
 import app.facade.reservationEditor.ReservationEditorFacade;
 import dbEntity.RezervaceMistnosti;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.model.DataModel;
 import javax.inject.Inject;
@@ -23,7 +25,7 @@ import view.facesMessenger.FacesMessengerUtil;
 @SessionScoped
 public class MojeRezervaceMB implements Serializable{
 
-    private DataModel items;
+    private ArrayList<RezervaceMistnosti> items;
     
     @Inject ReservationEditorFacade resFac;
     @Inject FacesMessengerUtil messUtil;
@@ -123,13 +125,13 @@ public class MojeRezervaceMB implements Serializable{
      * metoda pro zjištění všech rezervací přihlášeného uživatele
      * @return všechny rezervace přihlášeného uživatele
      */
-    public DataModel getItems(){
-        return resFac.getReservationsOfLoggedUser();
+    public ArrayList<RezervaceMistnosti> getItems(){
+        return new ArrayList<RezervaceMistnosti>(resFac.getReservationsOfLoggedUser());
     }
     /**
      * @param items the items to set
      */
-    public void setItems(DataModel items) {
+    public void setItems(ArrayList<RezervaceMistnosti> items) {
         this.items = items;
     }
 

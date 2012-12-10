@@ -6,7 +6,6 @@ package app.initConf;
 
 import app.DataCreator.DataCreator;
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;

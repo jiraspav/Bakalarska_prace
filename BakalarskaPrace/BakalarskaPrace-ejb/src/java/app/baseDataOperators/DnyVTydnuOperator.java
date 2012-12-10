@@ -43,4 +43,7 @@ public class DnyVTydnuOperator {
     public DenVTydnu getCZDen(String nazev){
         return denFac.getDenByCeskyNazev(nazev);
     }
+    public DenVTydnu getENDen(String nazev){
+        return denFac.getDenByNazev(nazev);
+    }
 }

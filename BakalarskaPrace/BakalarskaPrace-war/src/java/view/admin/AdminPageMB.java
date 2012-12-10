@@ -61,7 +61,7 @@ public class AdminPageMB implements Serializable{
         if(ready){
             ready = false;
             
-            if(session.getLoggedUzivatelLogin().equals("superadmin")){
+            if(session.getLoggedUzivatelLogin().equals("superadmi")){
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgDefaultAdminUpdateDBRestricted"));
             }
             else{
