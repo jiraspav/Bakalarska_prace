@@ -20,18 +20,32 @@ public class SemestrOperator {
     
     private @Inject SemestrFacade semFac;
     
+    /**
+     * Metoda pro uložení nového semestru do databáze
+     * @param idSemestru ID nového semestru
+     * @param code kód nového semestru (lze z něj určit rok a další informace)
+     * @param zacatek datum začátku nového semestru
+     * @param konec datum konce nového semestru
+     * @return uložený semestr
+     */
     public Semestr createSemestr(Integer idSemestru, String code, Date zacatek, Date konec) {
         
         Semestr semestr = new Semestr(idSemestru, code, zacatek, konec);
         
-        System.out.println("Semestr "+semestr.toString());
         
-        semFac.create(semestr);
-        
+        if(semFac.find(idSemestru) == null){
+            System.out.println("Semestr "+semestr.toString());
+            semFac.create(semestr);
+        }
         return semestr;
                 
     }
 
+    /**
+     * Metoda pro získání nejnovějšího semestru
+     * @return nejnovější semestr z databáze
+     *         prázdný semestr - pokud se žádný v databázi nenachází
+     */
     public Semestr getLatestSemestr(){
         
         Semestr soucasny;
@@ -44,6 +58,9 @@ public class SemestrOperator {
         return soucasny;
     }
     
+    /**
+     * Metoda pro odstranění všech semestrů z databáze
+     */
     public void deleteAll() {
         semFac.removeAll();
     }

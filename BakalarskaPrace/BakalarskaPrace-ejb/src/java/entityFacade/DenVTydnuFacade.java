@@ -25,19 +25,35 @@ public class DenVTydnuFacade extends AbstractFacade<DenVTydnu> {
     @PersistenceContext(unitName = "BakalarskaPracePU")
     private EntityManager em;
 
+    /**
+     * Getter pro EntityManager
+     * @return EntityManager pro DenVTydnuFacade
+     */
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Konstruktor
+     */
     public DenVTydnuFacade() {
         super(DenVTydnu.class);
     }
+    /**
+     * Metoda pro vyhledávání dat v databázi
+     * Vyhledává den podle zadaného anglického názvu(dochází k přeložení)
+     * 
+     * @param nazev
+     * @return
+     */
     public DenVTydnu getDenByNazev(String nazev){
         String prelozeno = null;
+        
         for(int i = 0;i<translator.length; i++){
             if(translator[i].equalsIgnoreCase(nazev)){
                 prelozeno = translator[i+1];
+        
                 break;
             }
         }
@@ -49,6 +65,13 @@ public class DenVTydnuFacade extends AbstractFacade<DenVTydnu> {
             return getDenByCeskyNazev("Neznámý");
         }
     }
+    /**
+     * Metoda pro vyhledávání dat v databázi
+     * Vyhledává den podle zadaného českého názvu
+     *
+     * @param nazev
+     * @return
+     */
     public DenVTydnu getDenByCeskyNazev(String nazev){
         try{
             Query qr = em.createNamedQuery("DenVTydnu.findByNazev");

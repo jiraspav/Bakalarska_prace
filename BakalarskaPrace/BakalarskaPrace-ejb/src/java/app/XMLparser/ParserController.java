@@ -5,6 +5,7 @@
 package app.XMLparser;
 
 
+import dbEntity.Uzivatel;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -34,11 +35,12 @@ public class ParserController {
     
     /**
      * vola metodu Parser.setDepartments()
+     * @param logged právě přihlášený uživatel
      * @see Parser
      */
-    public void fillDepartments() {
+    public void fillDepartments(Uzivatel logged) {
         try {
-            getParser().setDepartments();
+            getParser().setDepartments(logged);
         } catch (IOException ex) {
             //Logger.getLogger(ParserController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Couldnt connect.");
@@ -48,11 +50,12 @@ public class ParserController {
     
     /**
      * vola metodu Parser.setRooms()
+     * @param logged právě přihlášený uživatel
      * @see Parser
      */
-    public void fillRooms() {
+    public void fillRooms(Uzivatel logged) {
         try {
-            getParser().setRooms();
+            getParser().setRooms(logged);
         } catch (IOException ex) {
             //Logger.getLogger(ParserController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Couldnt connect.");
@@ -62,11 +65,12 @@ public class ParserController {
     
     /**
      * vola metodu Parser.setCourses()
+     * @param logged právě přihlášený uživatel
      * @see Parser 
      */
-    public void fillCourses() {
+    public void fillCourses(Uzivatel logged) {
         try {
-            getParser().setCourses();
+            getParser().setCourses(logged);
         } catch (IOException ex) {
             //Logger.getLogger(ParserController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Couldnt connect.");
@@ -74,11 +78,12 @@ public class ParserController {
     }
     /**
      * vola metodu Parser.setRozvrhy()
+     * @param logged právě přihlášený uživatel
      * @see Parser 
      */
-    public void fillRozvrhy() {
+    public void fillRozvrhy(Uzivatel logged) {
         try {
-            getParser().setRozvrhy();
+            getParser().setRozvrhy(logged);
         } catch (IOException ex) {
             //Logger.getLogger(ParserController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Couldnt connect.");
@@ -88,11 +93,12 @@ public class ParserController {
     
     /**
      * vola metodu Parser.setSemestr()
+     * @param logged právě přihlášený uživatel
      * @see Parser 
      */
-    public void fillSemestr() {
+    public void fillSemestr(Uzivatel logged) {
         try {
-            getParser().setSemestr();
+            getParser().setSemestr(logged);
         } catch (IOException ex) {
             //Logger.getLogger(ParserController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Couldnt connect.");

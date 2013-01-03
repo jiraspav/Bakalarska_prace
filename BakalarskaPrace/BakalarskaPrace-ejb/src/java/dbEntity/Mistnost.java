@@ -39,6 +39,10 @@ public class Mistnost implements Serializable {
     @NotNull
     @Column(name = "kapacita")
     private int kapacita;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "lokalita")
+    private String lokalita;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "iDmistnosti")
     private Collection<RezervaceMistnosti> rezervaceMistnostiCollection;
     @JoinColumn(name = "ID_strediska", referencedColumnName = "ID_stredisko")
@@ -60,6 +64,7 @@ public class Mistnost implements Serializable {
     public Mistnost(Long iDmistnosti, String zkratka) {
         this.iDmistnosti = iDmistnosti;
         this.zkratka = zkratka;
+        
     }
 
     public Long getIDmistnosti() {
@@ -159,6 +164,20 @@ public class Mistnost implements Serializable {
      */
     public void setiDtyp(TypMistnosti iDtyp) {
         this.iDtyp = iDtyp;
+    }
+
+    /**
+     * @return the lokalita
+     */
+    public String getLokalita() {
+        return lokalita;
+    }
+
+    /**
+     * @param lokalita the lokalita to set
+     */
+    public void setLokalita(String lokalita) {
+        this.lokalita = lokalita;
     }
     
 }

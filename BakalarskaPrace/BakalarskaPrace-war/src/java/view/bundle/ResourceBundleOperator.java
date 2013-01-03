@@ -14,6 +14,11 @@ import javax.ejb.Stateless;
 @Stateless
 public class ResourceBundleOperator {
     
+    /**
+     * Metoda pro získávání textu z bundle
+     * @param bundleName název textu z bundle
+     * @return text z bundle
+     */
     public String getMsg(String bundleName){
         ResourceBundle bundle = ResourceBundle.getBundle("view.bundle.messages");
         return bundle.getString(bundleName);

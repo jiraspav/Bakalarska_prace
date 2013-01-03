@@ -10,11 +10,11 @@
                     <file>${reference.BakalarskaPrace-ejb.dist}</file>
                 </library>
                 <library dirs="200">
-                    <file>${libs.Primefaces_3.4.1.classpath}</file>
+                    <file>${file.reference.cupertino-1.0.8.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.cupertino-1.0.8.jar}</file>
+                    <file>${libs.Primefaces_3.4.2.classpath}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

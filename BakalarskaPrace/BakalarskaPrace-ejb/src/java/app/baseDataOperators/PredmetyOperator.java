@@ -18,6 +18,13 @@ public class PredmetyOperator {
     
     private @Inject PredmetyFacade predFac;
     
+    /**
+     * Metoda pro uložení nového předmětu do databáze.
+     * @param id ID nového předmětu
+     * @param name celé jméno předmětu
+     * @param shortName zkratka jména tohoto předmětu
+     * @return uložený objekt typu Predmet
+     */
     public Predmety createPredmet(Long id, String name, String shortName) {
         
         Predmety predmet = new Predmety(id, name, shortName);
@@ -29,6 +36,9 @@ public class PredmetyOperator {
         return predmet;
     }
 
+    /**
+     * Metoda pro smazání veškerých předmětů z databáze.
+     */
     public void deleteAll() {
         predFac.removeAll();
     }

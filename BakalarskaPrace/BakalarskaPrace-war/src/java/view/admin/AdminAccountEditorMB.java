@@ -85,7 +85,7 @@ public class AdminAccountEditorMB implements Serializable{
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgSelfDeadmin"));
             }
             else if(uzivOper.isAdmin(selectedRow)){
-                accFac.removeAdminRights(selectedRow);
+                accFac.removeAdminRights(selectedRow, session.getLoggedUzivatel());
                 
                 messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgRoleChanged"));
             }
@@ -140,6 +140,11 @@ public class AdminAccountEditorMB implements Serializable{
     
     
 
+    /**
+     * 
+     * @param uziv
+     * @return
+     */
     public String getRole(Uzivatel uziv){
         return uzivOper.getUzivatelRole(uziv);
     }

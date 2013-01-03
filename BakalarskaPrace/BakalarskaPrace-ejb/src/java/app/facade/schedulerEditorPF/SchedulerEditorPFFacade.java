@@ -4,6 +4,7 @@
  */
 package app.facade.schedulerEditorPF;
 
+import dbEntity.Uzivatel;
 import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.TreeNode;
 
@@ -12,5 +13,12 @@ import org.primefaces.model.TreeNode;
  * @author Pavel
  */
 public interface SchedulerEditorPFFacade {
-    public ScheduleModel createNewModel(TreeNode mistnost);
+    /**
+     * Metoda pro vytváření nového ScheduleModelu
+     * 
+     * @param mistnost zkratka místnosti pro kterou se model vytváří
+     * @param logged přihlášený uživatel
+     * @return nový ScheduleModel vytvořený z rozvrhů a rezervací
+     */
+    public ScheduleModel createNewModel(TreeNode mistnost, Uzivatel logged);
 }

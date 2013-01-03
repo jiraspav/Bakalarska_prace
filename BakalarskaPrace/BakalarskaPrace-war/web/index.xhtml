@@ -9,6 +9,15 @@
     
 
     <ui:composition template="templateIndex.xhtml">
+        
+        <ui:define name="metadata">
+            <f:metadata>                    
+                    <f:event type="preRenderView" 
+                             listener="#{LoginVerifier.initRedirect}" />      
+                    
+            </f:metadata>
+        </ui:define>
+        
         <ui:define name="content">
             
             <h:form id="loginFrm" class="form-horizontal">

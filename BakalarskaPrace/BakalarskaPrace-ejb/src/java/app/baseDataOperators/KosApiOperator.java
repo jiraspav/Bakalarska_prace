@@ -18,10 +18,14 @@ import javax.net.ssl.HttpsURLConnection;
 @Stateless
 public class KosApiOperator {
     
+    /**
+     * Metoda pro vytvoření nového připojení na zadanou adresu.
+     * @param address URL adresa připojení
+     * @param login login určený pro autorizaci
+     * @param pass hrslo určené pro autorizaci
+     * @return nové připojení
+     */
     public HttpsURLConnection createNewConnection(String address, String login, String pass){
-        
-        login = "jiraspav";
-        pass = "paji74617461paji";
         
         HttpsURLConnection currConn = null;
         try {
@@ -36,10 +40,14 @@ public class KosApiOperator {
         
         } catch (IOException ex) {
             Logger.getLogger(KosApiOperator.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         return currConn;
     }
     
+    /**
+     * Metoda uzavírající dané připojení
+     * @param currConn HttpsURLConnection určené k uzavření
+     */
     public void closeConnection(HttpsURLConnection currConn){
         currConn.disconnect();
     }

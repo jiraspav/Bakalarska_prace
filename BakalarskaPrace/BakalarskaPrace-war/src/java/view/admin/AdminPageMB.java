@@ -56,20 +56,24 @@ public class AdminPageMB implements Serializable{
     /**
      * metoda zajišťující aktualizaci databáze
      */
+    
     @Asynchronous
     public void refreshDatabase(){
-        if(ready){
-            ready = false;
+        if(isReady()){
+            setReady(false);
             
-            if(session.getLoggedUzivatelLogin().equals("superadmi")){
+            if(session.getLoggedUzivatelLogin().equals("superadmin")){
                 messUtil.addFacesMsgError(bundle.getMsg("sysMsgDefaultAdminUpdateDBRestricted"));
             }
             else{
-                dbFac.refreshDatabase();
+                dbFac.refreshDatabase(session.getLoggedUzivatel());
                 messUtil.addFacesMsgInfo(bundle.getMsg("sysMsgUpdateComp"));
             }
             
-            ready = true;
+            setReady(true);
+        }
+        else{
+            messUtil.addFacesMsgError(bundle.getMsg("sysMsgUpdateInProgress"));
         }
     }
     
@@ -77,7 +81,7 @@ public class AdminPageMB implements Serializable{
      * @return the confDialog
      */
     public String getConfDialog() {
-        if(ready){
+        if(isReady()){
             confDialog = bundle.getMsg("adminConfDialogStarting");
         }
         else{
@@ -91,5 +95,19 @@ public class AdminPageMB implements Serializable{
      */
     public void setConfDialog(String confDialog) {
         this.confDialog = confDialog;
+    }
+
+    /**
+     * @return the ready
+     */
+    public boolean isReady() {
+        return ready;
+    }
+
+    /**
+     * @param ready the ready to set
+     */
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 }

@@ -20,16 +20,26 @@ public class SemestrFacade extends AbstractFacade<Semestr> {
     @PersistenceContext(unitName = "BakalarskaPracePU")
     private EntityManager em;
 
+    /**
+     * Getter pro EntityManager
+     * @return EntityManager pro SemestrFacade
+     */
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Konstruktor
+     */
     public SemestrFacade() {
         super(Semestr.class);
     }
     
     
+    /**
+     * Metoda pro odstranění všech semestrů z databáze
+     */
     public void removeAll(){
         
         ArrayList<Semestr> semestrAll = new ArrayList(this.findAll()) ;

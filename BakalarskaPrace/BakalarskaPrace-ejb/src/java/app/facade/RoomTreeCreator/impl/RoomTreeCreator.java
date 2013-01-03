@@ -29,13 +29,15 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
     @Inject private StrediskoOperator stredOper;
     @Inject private MistnostOperator mistOper;
     
+    /**
+     * Metoda pro vytvoření nové stromové struktury a její naplnění daty o střediskách
+     * a jejich místnostech určená pro Primefaces p:tree
+     * @param root základní node stromu
+     * @return základní node stromu s vytvořenou stromovou strukturou
+     */
     @Override
     public TreeNode createRoomTree(TreeNode root) {
         
-        
-            //System.out.println("Root not null");
-            //creates one default TreeNode named "CVUT"
-            
             TreeNode cvut = new DefaultTreeNode("ČVUT", root);
             cvut.setSelectable(false);
             
@@ -45,7 +47,7 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
             Collections.sort(allStrediska, new StrediskoComparator());
 
             for(Stredisko curr : allStrediska){
-                //System.out.println("FOR stredisko: "+curr.getNazev());
+                
                 //get all shortnames of all Mistnost from one Stredisko
                 List<String> zkratky = getShortNames(mistOper.getMistnosti(curr));
 
@@ -63,14 +65,6 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
             }
         
         return root;  
-    }
-    
-    private TreeNode createDefaultTree(TreeNode root){
-        
-        TreeNode cvut = new DefaultTreeNode("ČVUT", root);
-        cvut.setSelectable(false);
-        
-        return cvut;
     }
     
     private List<String> getShortNames(List<Mistnost> mistnosti){
@@ -93,6 +87,20 @@ public class RoomTreeCreator implements RoomTreeCreatorFacade{
         }
         
         return node;
+    }
+
+    /**
+     * @param stredOper the stredOper to set
+     */
+    public void setStredOper(StrediskoOperator stredOper) {
+        this.stredOper = stredOper;
+    }
+
+    /**
+     * @param mistOper the mistOper to set
+     */
+    public void setMistOper(MistnostOperator mistOper) {
+        this.mistOper = mistOper;
     }
     
 }

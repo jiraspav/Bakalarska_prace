@@ -4,9 +4,7 @@
  */
 package dbEntity;
 
-import entityFacade.GroupTableFacade;
 import java.io.Serializable;
-import javax.inject.Inject;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -46,10 +44,11 @@ public class Uzivatel implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "jmeno")
     private String jmeno;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "kontakt")
+    private String kontakt;
     
-//    @JoinColumn(name = "ID_role", referencedColumnName = "ID_role")
-//    @ManyToOne(optional = false)
-//    private Role iDrole;
 
     public static final String FIND_BY_NAME = "Uzivatel.findByJmeno";
     public static final String FIND_BY_LOGIN = "Uzivatel.findByLogin";
@@ -63,10 +62,11 @@ public class Uzivatel implements Serializable {
         this.iDuser = iDuser;
     }
 
-    public Uzivatel(Long iDuser, String login, String jmeno) {
+    public Uzivatel(Long iDuser, String login, String jmeno, String kontakt) {
         this.iDuser = iDuser;
         this.login = login;
         this.jmeno = jmeno;
+        this.kontakt = kontakt;
     }
     
     public Long getIDuser() {
@@ -134,6 +134,20 @@ public class Uzivatel implements Serializable {
      */
     public void setHeslo(String heslo) {
         this.heslo = heslo;
+    }
+
+    /**
+     * @return the kontakt
+     */
+    public String getKontakt() {
+        return kontakt;
+    }
+
+    /**
+     * @param kontakt the kontakt to set
+     */
+    public void setKontakt(String kontakt) {
+        this.kontakt = kontakt;
     }
 
 }

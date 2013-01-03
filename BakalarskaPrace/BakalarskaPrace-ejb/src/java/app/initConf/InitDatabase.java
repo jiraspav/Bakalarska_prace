@@ -8,6 +8,7 @@ import app.DataCreator.DataCreator;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 /**
@@ -24,4 +25,5 @@ public class InitDatabase {
     private void initData(){
         dataCreator.initDefaultConf();
     }
+    
 }

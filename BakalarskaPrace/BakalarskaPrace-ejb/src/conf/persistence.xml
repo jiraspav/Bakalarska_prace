@@ -14,6 +14,7 @@
     <class>dbEntity.UpdateRozvrhu</class>
     <class>dbEntity.Uzivatel</class>
     <class>dbEntity.TypMistnosti</class>
+    <class>dbEntity.Vyucujici</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables"/>

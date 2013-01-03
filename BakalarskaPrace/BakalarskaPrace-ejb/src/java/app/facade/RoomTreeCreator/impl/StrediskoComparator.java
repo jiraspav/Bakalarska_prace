@@ -13,6 +13,13 @@ import java.util.Comparator;
  */
 public class StrediskoComparator implements Comparator {
     
+    /**
+     * Comparator pro dvě střediska
+     * @param jedna
+     * @param dva
+     * @return 1 - pokud stejné
+     *         jinak jsou odlišné
+     */
     @Override
     public int compare(Object jedna, Object dva){    
  

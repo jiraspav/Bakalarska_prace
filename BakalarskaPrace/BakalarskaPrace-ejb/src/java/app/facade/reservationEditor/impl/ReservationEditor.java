@@ -11,7 +11,6 @@ import app.baseDataOperators.RozvrhyOperator;
 import app.baseDataOperators.UzivatelOperator;
 import app.facade.reservationEditor.ReservationEditorFacade;
 import app.facade.roomFinder.RoomFinderFacade;
-import app.sessionHolder.SessionHolderEJB;
 import app.sweeper.Sweeper;
 import dbEntity.*;
 import java.text.SimpleDateFormat;
@@ -32,7 +31,6 @@ import javax.inject.Inject;
 @Local(ReservationEditorFacade.class)
 public class ReservationEditor implements ReservationEditorFacade{
 
-    private @Inject SessionHolderEJB session;
     private @Inject RezervaceMistnostiOperator rezOper;
     private @Inject RozvrhyOperator rozOper;
     private @Inject DnyVTydnuOperator denOper;
@@ -41,8 +39,16 @@ public class ReservationEditor implements ReservationEditorFacade{
     private @Inject RoomFinderFacade roomFac;
     private @Inject Sweeper sweeper;
     
+    /**
+     * Metoda pro uložení rezervací v Listu. Je nutné zkontrolovat ostatní rezervace v místnosti
+     * případně je nutné vybrat rezervace, které je nutné přepsat.
+     * 
+     * @param mistnost - mstnost na kterou jsou rezervace ukládány
+     * @param preparedReservations - List ukládaných rezervací
+     * @param logged - uživatel, který tyto rezervace vytváří
+     */
     @Override
-    public void createAllReservations(Mistnost mistnost, List<RezervaceMistnosti> preparedReservations){
+    public void createAllReservations(Mistnost mistnost, List<RezervaceMistnosti> preparedReservations, Uzivatel logged){
         //PRO KAZDOU PREPARED NAJIT REZERVACE NA STEJNY DEN A MISTNOST
         //NAJIT TY KTERE SE PREKRYVAJI
         //U TECH KAM SE PREPARED NEVEJDOU A ZAROVEN JE PREPARED VYSSI PRIORITA NASTAVIT STATUS OVERWRITEN
@@ -53,7 +59,7 @@ public class ReservationEditor implements ReservationEditorFacade{
             List<RezervaceMistnosti> rezervace = rezOper.getRezervace(rez.getDatumRezervace(), mistnost);
             
             for(RezervaceMistnosti temp : rezervace){
-                System.out.println("RESERVATION: mistnost - "+temp.getIDmistnosti().getZkratka()+" datum - "+temp.getDatumRezervace()+" od - "+temp.getOd()+" do - "+temp.getDo1()+" pocet - "+temp.getPocetRezervovanychMist()+" popis - "+temp.getPopis());
+                //System.out.println("RESERVATION: mistnost - "+temp.getIDmistnosti().getZkratka()+" datum - "+temp.getDatumRezervace()+" od - "+temp.getOd()+" do - "+temp.getDo1()+" pocet - "+temp.getPocetRezervovanychMist()+" popis - "+temp.getPopis());
                 if(temp.getStatus().equals("OVERWRITTEN")){
                     System.out.println("ALERT ALERT STATUS BREACH!!!");
                 }
@@ -62,95 +68,116 @@ public class ReservationEditor implements ReservationEditorFacade{
                 }
             }
             
-            ArrayList<RezervaceMistnosti> overwritten = sweeper.getOverwrittenReservations(rez, interfering);
+            ArrayList<RezervaceMistnosti> overwritten = sweeper.getOverwrittenReservations(rez, interfering, logged);
+            //System.out.println("Number of overwritten:"+overwritten.size());
             //RESERVATION STATUS SWITCH HANDLER
             for(RezervaceMistnosti temp : overwritten){
+                //System.out.println("prepis");
                 rezOper.changeStatusToOverWritten(temp);
             }
             
             
             
-            this.createReservation(mistnost, rez.getDatumRezervace(), rez.getOd(), rez.getDo1(), rez.getPocetRezervovanychMist(), rez.getPopis());
+            this.createReservation(mistnost, rez.getDatumRezervace(), rez.getOd(), rez.getDo1(), rez.getPocetRezervovanychMist(), rez.getPopis(), logged);
             sweeper.RESET_VALUES();
         }
     }
 
-    private ArrayList<RezervaceMistnosti> getLowerPriorityReservations(ArrayList<RezervaceMistnosti> reservations){
+    private ArrayList<RezervaceMistnosti> getLowerPriorityReservations(ArrayList<RezervaceMistnosti> reservations, Uzivatel logged){
         
         ArrayList<RezervaceMistnosti> reservationsCache = new ArrayList<RezervaceMistnosti>(reservations);
         
         for(RezervaceMistnosti res: reservations){
-            if(sweeper.isHigherPriorityThanLogged(res)){
+            if(sweeper.isHigherPriorityThanLogged(res,logged)){
                 reservationsCache.remove(res);
             }
         }
         return reservationsCache;
     }
+    /**
+     * Metoda pro uložení jedné rezervace.
+     * 
+     * @param mistnost místnost na kterou je tato rezervace
+     * @param startDate datum rezervace
+     * @param casOd čas začátku rezervace
+     * @param casDo čas konce rezervace
+     * @param pocetMist počet rezervovaných míst
+     * @param popis popis rezervace
+     * @param logged uživatel vytvářející tuto rezervaci
+     */
     @Override
-    public void createReservation(Mistnost mistnost, Date startDate, Date casOd, Date casDo, int pocetMist , String popis) {
-        rezOper.createRezervaceMistnosti(session.getLoggedUzivatel(), mistnost, startDate, casOd, casDo, pocetMist, popis);
+    public void createReservation(Mistnost mistnost, Date startDate, Date casOd, Date casDo, int pocetMist , String popis, Uzivatel logged) {
+        rezOper.createRezervaceMistnosti(logged, mistnost, startDate, casOd, casDo, pocetMist, popis);
     }
         
-    @Override
-    public void editReservation(RezervaceMistnosti selectedRow, Date editDateOfReservation, Date editFrom, Date editTo) {
-        rezOper.editRezervaceMistnosti(selectedRow, null, null, editDateOfReservation, editFrom, editTo, null, null);
-    }
     
+    /**
+     * Metoda pro mazání rezervace z databáze
+     * 
+     * @param selectedRow - označená rezervace určená pro odstranění
+     */
     @Override
     public void deleteReservation(RezervaceMistnosti selectedRow) {
         rezOper.delete(selectedRow);
     }
 
+    /**
+     * Metoda pro získání rezervací uživatele
+     * @param logged
+     * @return List rezervací jejichž vlastníkem je uživatel v parametru
+     */
     @Override
-    public List<RezervaceMistnosti> getReservationsOfLoggedUser() {
-        Uzivatel user = session.getLoggedUzivatel();
-        return rezOper.getRezervace(user);
-    }
-
-    @Override
-    public String isReservationOK(String mistnostZkratka, Date editDateOfReservation, Date editDateFrom, Date editDateTo) {
-        RezervaceMistnosti rez = new RezervaceMistnosti();
-        rez.setIDmistnosti(mistOper.getMistnost(mistnostZkratka));
+    public List<RezervaceMistnosti> getReservationsOfLoggedUser(Uzivatel logged) {
         
-        return isReservationOK(rez, editDateOfReservation, editDateFrom, editDateTo);
-    }
-    
-    @Override
-    public String isReservationOK(RezervaceMistnosti selectedRow, Date editDateOfReservation, Date editDateFrom, Date editDateTo) {
-                    
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE",Locale.ENGLISH);
-
-        DenVTydnu denRezervace = denOper.getENDen(sdf.format(editDateOfReservation));
-
-        ArrayList<RezervaceMistnosti> rezervaceMistnosti = new ArrayList(rezOper.getRezervace(editDateOfReservation, selectedRow.getIDmistnosti()));
-        ArrayList<Rozvrhy> rozvrhyMistnosti = new ArrayList(rozOper.getRozvrhy(selectedRow.getIDmistnosti(), denRezervace));
-
-
-        //checks all schedules for this room
-
-        for(Rozvrhy rez : rozvrhyMistnosti){
-
-            if(!((editDateFrom.after(rez.getDo1())) || (editDateTo.before(rez.getOd())))){
-                return "alreadyscheduled";
-            }
-        }
-
-
-        //checks all made reservations on this room
-        //DEFAULT VALUES NEEDS TO BE REWRITED
-        RezervaceMistnosti curr = new RezervaceMistnosti(editDateOfReservation, editDateFrom, editDateTo, 0, "") ;
-
-        if(!roomFac.isEnoughSpace(curr, selectedRow.getIDmistnosti())) {
-            return "alreadyReserved";
-        }
-                
-        return "ok";
-        
+        return rezOper.getRezervace(logged);
     }
 
+    /**
+     * @param rezOper the rezOper to set
+     */
+    public void setRezOper(RezervaceMistnostiOperator rezOper) {
+        this.rezOper = rezOper;
+    }
 
+    /**
+     * @param rozOper the rozOper to set
+     */
+    public void setRozOper(RozvrhyOperator rozOper) {
+        this.rozOper = rozOper;
+    }
 
+    /**
+     * @param denOper the denOper to set
+     */
+    public void setDenOper(DnyVTydnuOperator denOper) {
+        this.denOper = denOper;
+    }
 
-    
-    
+    /**
+     * @param uzivOper the uzivOper to set
+     */
+    public void setUzivOper(UzivatelOperator uzivOper) {
+        this.uzivOper = uzivOper;
+    }
+
+    /**
+     * @param mistOper the mistOper to set
+     */
+    public void setMistOper(MistnostOperator mistOper) {
+        this.mistOper = mistOper;
+    }
+
+    /**
+     * @param roomFac the roomFac to set
+     */
+    public void setRoomFac(RoomFinderFacade roomFac) {
+        this.roomFac = roomFac;
+    }
+
+    /**
+     * @param sweeper the sweeper to set
+     */
+    public void setSweeper(Sweeper sweeper) {
+        this.sweeper = sweeper;
+    }
 }

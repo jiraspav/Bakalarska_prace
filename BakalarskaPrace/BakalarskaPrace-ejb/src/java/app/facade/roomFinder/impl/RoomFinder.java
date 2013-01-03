@@ -6,12 +6,8 @@ package app.facade.roomFinder.impl;
 
 import app.baseDataOperators.*;
 import app.facade.roomFinder.RoomFinderFacade;
-import app.sessionHolder.SessionHolderEJB;
 import app.sweeper.Sweeper;
-import dbEntity.DenVTydnu;
-import dbEntity.Mistnost;
-import dbEntity.RezervaceMistnosti;
-import dbEntity.Rozvrhy;
+import dbEntity.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,25 +25,33 @@ import javax.inject.Inject;
 @Local(RoomFinderFacade.class)
 public class RoomFinder implements RoomFinderFacade{
 
-    @Inject Sweeper sweeper;
-    @Inject MistnostOperator mistOper;
-    @Inject RezervaceMistnostiOperator rezOper;
-    @Inject UzivatelOperator uzivOper;
-    @Inject SessionHolderEJB session;
-    @Inject RozvrhyOperator rozOper;
-    @Inject DnyVTydnuOperator denOper;
+    @Inject private Sweeper sweeper;
+    @Inject private MistnostOperator mistOper;
+    @Inject private RezervaceMistnostiOperator rezOper;
+    @Inject private UzivatelOperator uzivOper;
+    @Inject private RozvrhyOperator rozOper;
+    @Inject private DnyVTydnuOperator denOper;
     
-    //VRACI VOLNE MISTNOSTI PRO VSECHNY ZADANE REZERVACE
+    
+    /**
+     * Metoda pro získání všech volných místností pro přípravené rezervace
+     * 
+     * @param preparedReservations - rezervace připravené pro uložení do databáze
+     * @param logged - vlastník rezervaci
+     * @return List volných místností
+     */
     @Override
-    public List<Mistnost> getAllFreeRooms(List<RezervaceMistnosti> preparedRezervations) {
+    public List<Mistnost> getAllFreeRooms(List<RezervaceMistnosti> preparedRezervations, Uzivatel logged) {
+        
+        //System.out.println("NUMBER OF REZERVATIONS:"+preparedRezervations.size());
         
         List<Mistnost> volneMistnostiCache = mistOper.getAll();
         
         //prochazim vsechny rezervace pripravene pro zapis do db
         for(RezervaceMistnosti curr: preparedRezervations){
             //pro kazdou rezervaci najdu volne mistnosti
-            List<Mistnost> freeRooms = getAllFreeRoomsOnOneReservation(curr);
-            
+            List<Mistnost> freeRooms = getAllFreeRoomsOnOneReservation(curr,logged);
+            //System.out.println("POCET VOLNYCH : "+freeRooms.size());
             //a ty mistnosti, ktere se nachazeji v cache i v volnych mistnostech necham v cache, ostatni smazu
             List<Mistnost> temp = new ArrayList<Mistnost>();
             for(Mistnost mist : freeRooms){
@@ -55,9 +59,9 @@ public class RoomFinder implements RoomFinderFacade{
                 if(volneMistnostiCache.contains(mist)){
                     temp.add(mist);
                 }
-                else{
+                /*else{
                     System.out.println("Mistnost NOT free: "+mist.getZkratka());
-                }
+                }*/
             }
             volneMistnostiCache = temp;
             
@@ -67,7 +71,13 @@ public class RoomFinder implements RoomFinderFacade{
     }
     
     //VRACI VOLNE MISTNOSTI PRO JEDNU ZADANOU REZERVACI
-    public List<Mistnost> getAllFreeRoomsOnOneReservation(RezervaceMistnosti curr) {
+    /**
+     * 
+     * @param curr
+     * @param logged
+     * @return
+     */
+    public List<Mistnost> getAllFreeRoomsOnOneReservation(RezervaceMistnosti curr, Uzivatel logged) {
         
         Date day = curr.getDatumRezervace();
         Date odCas = curr.getOd();
@@ -75,10 +85,9 @@ public class RoomFinder implements RoomFinderFacade{
         
         ArrayList<Mistnost> mistnosti = new ArrayList<Mistnost>(mistOper.getAll());
         
-
+        //System.out.println("MISTNOSTI:"+mistnosti.size());
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE",Locale.ENGLISH);
 
-        System.out.println("DEN REZERVACE "+sdf.format(day));
         DenVTydnu denRezervace = denOper.getENDen(sdf.format(day));
         
         
@@ -95,7 +104,7 @@ public class RoomFinder implements RoomFinderFacade{
                 
                 
                 if(isInterfering(roz, odCas, doCas)){
-                    System.out.println("INTERFERING Rozvrh na "+roz.getIDdnu().getNazev()+" od "+roz.getOd()+" do "+roz.getDo1()+" interfering? "+isInterfering(roz, odCas, doCas));
+                    
                     mistnostiCache.remove(mist);
                 }
             }
@@ -104,27 +113,46 @@ public class RoomFinder implements RoomFinderFacade{
         
         mistnosti = new ArrayList<Mistnost>(mistnostiCache);
         
-        
-        
         //Check all reservations which interfere with mine and nejsou v mistnosti s rozvrhem, ktery by prekryval moji, remove occupied rooms
         for(Mistnost mist : mistnosti){
             
-            if(!isEnoughSpace(curr, mist)){
+            if(!isEnoughSpace(curr, mist, logged)){
                 //System.out.println("Not enough space "+mist.getZkratka());
                 mistnostiCache.remove(mist);
             }
         }
         
-
-        
         return mistnostiCache ;
     }
 
     
-    //JE TO NA SPRAVNEM MISTE???
+    /**
+     * Metoda pro zjištění zda rezervcae překrývá některý z rozvrhů
+     * @param rez
+     * @param rozvrhy
+     * @return true - pokud překrývá
+     */
+    @Override
+    public boolean isInterfering(RezervaceMistnosti rez, ArrayList<Rozvrhy> rozvrhy){
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        
+        for(Rozvrhy curr: rozvrhy){
+            
+            if(isInterfering(curr, rez.getOd(),rez.getDo1()) && sdf.format(rez.getDatumRezervace()).equals(curr.getIDdnu().getNazev())){
+                return true;
+            }
+        }
+        return false;
+    }
     
     
-    
+    /**
+     * Metoda pro zjištění rezervací, které novou překrývají
+     * @param rez nová rezervace
+     * @param preparedReservations list rezervací pro které zjišťuji zda je nová překrývá
+     * @return true - pokud překrývá
+     */
     @Override
     public boolean isInterfering(RezervaceMistnosti rez, List<RezervaceMistnosti> preparedReservations){
         
@@ -136,6 +164,12 @@ public class RoomFinder implements RoomFinderFacade{
         return false;
     }
     
+    /**
+     * Metoda pro zjištění zda se dvě rezervace překrývají
+     * @param rez
+     * @param rez2
+     * @return true - pokud se překrývají
+     */
     @Override
     public boolean isInterfering(RezervaceMistnosti curr , RezervaceMistnosti rez){
         if(curr.getDatumRezervace().equals(rez.getDatumRezervace())){
@@ -145,6 +179,16 @@ public class RoomFinder implements RoomFinderFacade{
             return false;
         }
     }
+    
+    private boolean isInterfering(Rozvrhy roz1, Rozvrhy roz2){
+        if(roz1.getIDmistnosti().equals(roz2.getIDmistnosti()) && roz1.getIDdnu().equals(roz2.getIDdnu())){
+            return isInterfering(roz1, roz2.getOd(), roz2.getDo1());
+        }else{
+            return false;
+        }
+    }
+    
+    
     
     private boolean isInterfering(Rozvrhy rez , Date odCas, Date doCas){
         return !((odCas.after(rez.getDo1())) || (doCas.before(rez.getOd())));
@@ -156,23 +200,34 @@ public class RoomFinder implements RoomFinderFacade{
     
 
     
+    /**
+     * Metoda zjišťující zda je v místnosti dostatek místa pro vložení nové rezervace.
+     * 
+     * @param rez vkládaná rezervace
+     * @param mist místnost do které je rezervace vkládána
+     * @param logged vlastník rezervace
+     * @return - true - pokud je dostatek místa v místnosti
+     *          <p>
+     *         - false - pokud není dostatek místa
+     */
     @Override
-    public boolean isEnoughSpace(RezervaceMistnosti rez, Mistnost mist){
+    public boolean isEnoughSpace(RezervaceMistnosti rez, Mistnost mist, Uzivatel logged){
         
         //System.out.println("Rezervace mist "+rez.getPocetRezervovanychMist()+" Mistnost mist "+mist.getKapacita());
         boolean response = true;
         if(mist.getKapacita() < rez.getPocetRezervovanychMist()){
             response = false;
         }
-        else if(rez.getPocetRezervovanychMist() > (mist.getKapacita() - getPocetRezervovanychMist(rez,mist))){
+        else if(rez.getPocetRezervovanychMist() > (mist.getKapacita() - getPocetRezervovanychMist(rez,mist,logged))){
             response = false;
         }
         //System.out.println("Response: "+response);
+        
         return response;
         
     }
     
-    private int getPocetRezervovanychMist(RezervaceMistnosti rez, Mistnost mist) {
+    private int getPocetRezervovanychMist(RezervaceMistnosti rez, Mistnost mist, Uzivatel logged) {
         //VSECHNY REZERVACE NA TUTO MISTNOSTI + NA DATUM TETO REZERVACE
         //VSECHNY REZERVACE PROJIT A NAJIT TY CO SE MLATI S REZ
         //Z NICH NAJIT MINIMUM Z (kapacita mistnosti - rezervace.pocetMist) <- SPATNE JE NUTNE POUZIT ZAMETACI METODU
@@ -188,6 +243,48 @@ public class RoomFinder implements RoomFinderFacade{
         }
         
 
-        return sweeper.getMaximumReserved(interferingReservations);
+        return sweeper.getMaximumReserved(interferingReservations,logged);
+    }
+
+    /**
+     * @param sweeper the sweeper to set
+     */
+    public void setSweeper(Sweeper sweeper) {
+        this.sweeper = sweeper;
+    }
+
+    /**
+     * @param mistOper the mistOper to set
+     */
+    public void setMistOper(MistnostOperator mistOper) {
+        this.mistOper = mistOper;
+    }
+
+    /**
+     * @param rezOper the rezOper to set
+     */
+    public void setRezOper(RezervaceMistnostiOperator rezOper) {
+        this.rezOper = rezOper;
+    }
+
+    /**
+     * @param uzivOper the uzivOper to set
+     */
+    public void setUzivOper(UzivatelOperator uzivOper) {
+        this.uzivOper = uzivOper;
+    }
+
+    /**
+     * @param rozOper the rozOper to set
+     */
+    public void setRozOper(RozvrhyOperator rozOper) {
+        this.rozOper = rozOper;
+    }
+
+    /**
+     * @param denOper the denOper to set
+     */
+    public void setDenOper(DnyVTydnuOperator denOper) {
+        this.denOper = denOper;
     }
 }

@@ -4,46 +4,80 @@
  */
 package entityFacade;
 
-import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.validation.ConstraintViolationException;
 
 /**
- *
+ *  Abstraktní EntityManager
+ * @param <T> konkrétní třída
  * @author Pavel
  */
 public abstract class AbstractFacade<T> {
     private Class<T> entityClass;
 
+    /**
+     * 
+     * @param entityClass
+     */
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 
+    /**
+     * 
+     * @return
+     */
     protected abstract EntityManager getEntityManager();
 
+    /**
+     * Abstraktní metoda pro ukládání entit do databáze
+     * 
+     * @param entity
+     */
     public void create(T entity) {
         getEntityManager().persist(entity);
     }
 
+    /**
+     * Abstraktní metoda pro aktualizaci entity v databázi
+     * @param entity
+     */
     public void edit(T entity) {
         getEntityManager().merge(entity);
     }
 
+    /**
+     * Abstraktní metoda pro odstraňování entit z databáze
+     * @param entity
+     */
     public void remove(T entity) {
         getEntityManager().remove(getEntityManager().merge(entity));
     }
 
+    /**
+     * Abstraktní metoda pro vyhledávání entit v databázi
+     * @param id
+     * @return
+     */
     public T find(Object id) {
         return getEntityManager().find(entityClass, id);
     }
 
+    /**
+     * Abstraktní metoda pro vyhledání všech entit v databázi
+     * @return
+     */
     public List<T> findAll() {
         javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
         return getEntityManager().createQuery(cq).getResultList();
     }
 
+    /**
+     * 
+     * @param range
+     * @return
+     */
     public List<T> findRange(int[] range) {
         javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
@@ -53,6 +87,10 @@ public abstract class AbstractFacade<T> {
         return q.getResultList();
     }
 
+    /**
+     * Abstraktní metoda pro spočítání entit v databázi
+     * @return
+     */
     public int count() {
         javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         javax.persistence.criteria.Root<T> rt = cq.from(entityClass);

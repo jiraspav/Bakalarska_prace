@@ -5,6 +5,8 @@
 package dbEntity;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -62,6 +64,17 @@ public class Rozvrhy implements Serializable {
     @ManyToOne(optional = false)
     private Predmety iDpredmetu;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name="vyucujiciRozvrhu",
+            joinColumns={
+                @JoinColumn(name="vyucujici_id")
+            },
+            inverseJoinColumns={
+                @JoinColumn(name="rozvrh_id")
+            }
+            )
+    private Collection<Vyucujici> vyucujiciCollection;
     
     public static final String FIND_ALL = "Rozvrhy.findAll";
     public static final String FIND_ROZVRH_BY_ID = "Rozvrhy.findByIDrozvrhu";
@@ -75,12 +88,16 @@ public class Rozvrhy implements Serializable {
         this.iDrozvrhu = iDrozvrhu;
     }
 
-    public Rozvrhy(Long iDrozvrhu, Date od, Date do1, boolean lichyTyden, boolean sudyTyden) {
+    public Rozvrhy(Long iDrozvrhu, Date od, Date do1, boolean lichyTyden, boolean sudyTyden, Mistnost iDmistnosti, DenVTydnu iDdnu, Predmety iDpredmetu, Collection<Vyucujici> vyucujiciCollection) {
         this.iDrozvrhu = iDrozvrhu;
         this.od = od;
         this.do1 = do1;
         this.lichyTyden = lichyTyden;
         this.sudyTyden = sudyTyden;
+        this.vyucujiciCollection = vyucujiciCollection;
+        this.iDpredmetu = iDpredmetu;
+        this.iDmistnosti = iDmistnosti;
+        this.iDdnu = iDdnu;
     }
 
     public Long getIDrozvrhu() {
@@ -90,7 +107,10 @@ public class Rozvrhy implements Serializable {
     public void setIDrozvrhu(Long iDrozvrhu) {
         this.iDrozvrhu = iDrozvrhu;
     }
-
+    public String getFormatedOd(){
+        SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+        return sdf.format(od);
+    }
     public Date getOd() {
         return od;
     }
@@ -98,7 +118,10 @@ public class Rozvrhy implements Serializable {
     public void setOd(Date od) {
         this.od = od;
     }
-
+    public String getFormatedDo(){
+        SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+        return sdf.format(do1);
+    }
     public Date getDo1() {
         return do1;
     }
@@ -170,6 +193,20 @@ public class Rozvrhy implements Serializable {
     @Override
     public String toString() {
         return "dbEntity.Rozvrhy[ iDrozvrhu=" + iDrozvrhu + " ]";
+    }
+
+    /**
+     * @return the vyucujiciCollection
+     */
+    public Collection<Vyucujici> getVyucujiciCollection() {
+        return vyucujiciCollection;
+    }
+
+    /**
+     * @param vyucujiciCollection the vyucujiciCollection to set
+     */
+    public void setVyucujiciCollection(Collection<Vyucujici> vyucujiciCollection) {
+        this.vyucujiciCollection = vyucujiciCollection;
     }
     
 }

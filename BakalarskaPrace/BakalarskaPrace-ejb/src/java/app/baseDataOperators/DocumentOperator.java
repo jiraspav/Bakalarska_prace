@@ -23,6 +23,11 @@ import org.xml.sax.SAXException;
 public class DocumentOperator {
     
     
+    /**
+     * Metoda pro získání nového objektu typu Document ze streamu.
+     * @param input stream ze kterého se načítají data
+     * @return nový objekt typu Document
+     */
     public Document getNewDocument(InputStream input){
             Document doc = null;
         try {

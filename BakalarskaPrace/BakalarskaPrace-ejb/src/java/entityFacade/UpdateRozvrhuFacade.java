@@ -20,15 +20,25 @@ public class UpdateRozvrhuFacade extends AbstractFacade<UpdateRozvrhu> {
     @PersistenceContext(unitName = "BakalarskaPracePU")
     private EntityManager em;
 
+    /**
+     * Getter pro EntityManager
+     * @return EntityManager pro UpdateRozvrhuFacade
+     */
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Konstruktor
+     */
     public UpdateRozvrhuFacade() {
         super(UpdateRozvrhu.class);
     }
     
+    /**
+     * Metoda pro odstranění všech záznamů o aktualizaci z databáze
+     */
     public void removeAll(){
         
         ArrayList<UpdateRozvrhu> updateRozvrhuAll = new ArrayList(this.findAll()) ;

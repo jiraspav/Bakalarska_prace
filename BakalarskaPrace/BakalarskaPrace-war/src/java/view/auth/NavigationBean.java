@@ -84,8 +84,20 @@ public class NavigationBean {
     public String success(){
         return "success";
     }
+    /**
+    * metoda používaná pro navigace napříč stránkami.
+    * konkrétně na rezervace.xhtml
+     * @return
+     */
     public String toAllTogether(){
         return "alltogether";
+    }
+    /**
+     * 
+     * @return
+     */
+    public String toAccEditor(){
+        return "accountEditor";
     }
     
     /**

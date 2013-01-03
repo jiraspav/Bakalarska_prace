@@ -7,11 +7,7 @@ package app.DataCreator;
 import app.baseDataOperators.DnyVTydnuOperator;
 import app.baseDataOperators.TypMistnostiOperator;
 import app.baseDataOperators.UzivatelOperator;
-import app.sessionHolder.SessionHolderEJB;
-import dbEntity.TypMistnosti;
-import dbEntity.Uzivatel;
 import entityFacade.DenVTydnuFacade;
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -26,10 +22,13 @@ public class DataCreator {
     private @Inject DenVTydnuFacade denFac;
     private @Inject DnyVTydnuOperator dnyOperator;
     private @Inject UzivatelOperator uzivOperator;
-    public @Inject SessionHolderEJB session;
     
 
     
+    /**
+     * Metoda pro startovní nastavení aplikace. Zajišťuje naplnění databáze základními
+     * daty jako jsou dny,typy místností nebo defaultní uživatelé
+     */
     public void initDefaultConf(){
         if(!isDefaultConf()){
             buildDny();

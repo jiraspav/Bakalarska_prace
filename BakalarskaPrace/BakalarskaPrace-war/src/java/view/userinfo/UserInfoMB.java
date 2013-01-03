@@ -19,26 +19,14 @@ public class UserInfoMB {
     
     private @Inject SessionHolderMB session;
     
-    private String login,name,role;
+    private String name;
     
 
     //--------------------------------------------------------------------------
     //-------------------------GETTERS, SETTERS---------------------------------
     //--------------------------------------------------------------------------
     
-    /**
-     * @return the login
-     */
-    public String getLogin() {
-        return session.getLoggedUzivatelLogin();
-    }
-
-    /**
-     * @param login the login to set
-     */
-    public void setLogin(String login) {
-        this.login = login;
-    }
+  
 
     /**
      * @return the name
@@ -54,21 +42,4 @@ public class UserInfoMB {
         this.name = name;
     }
 
-    /**
-     * @return the role
-     */
-    public String getRole() {
-        
-        return session.getLoggedUzivatelRole();
-    }
-
-    /**
-     * @param role the role to set
-     */
-    public void setRole(String role) {
-        this.role = role;
-    }
-    
-    
-    
 }

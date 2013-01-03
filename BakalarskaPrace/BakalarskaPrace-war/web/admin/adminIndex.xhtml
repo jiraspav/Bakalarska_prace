@@ -22,7 +22,7 @@
                         <h:outputText id="posledniAktualizace" value="#{adminPageMB.getLastUpdate()}"/>
                     </p:panelGrid>
                </p:panel>     
-               <p:commandButton value="#{msgs.adminPageLabelDBbutton}" actionListener="#{adminPageMB.refreshDatabase()}" update="confDialog msgs" onclick="confirmDialog.show()"/>
+               <p:commandButton value="#{msgs.adminPageLabelDBbutton}" actionListener="#{adminPageMB.refreshDatabase()}" disabled="#{!adminPageMB.ready}" update="confDialog msgs" onclick="confirmDialog.show()"/>
                
                <p:dialog header="#{msgs.adminPageLabelDialogHeader}" widgetVar="confirmDialog" resizable="false"  
                                 width="200" showEffect="clip" hideEffect="fold" modal="true">

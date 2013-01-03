@@ -20,15 +20,25 @@ public class PredmetyFacade extends AbstractFacade<Predmety> {
     @PersistenceContext(unitName = "BakalarskaPracePU")
     private EntityManager em;
 
+    /**
+     * Getter pro EntityManager
+     * @return EntityManager pro PredmetyFacade
+     */
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Konstruktor
+     */
     public PredmetyFacade() {
         super(Predmety.class);
     }
     
+    /**
+     * Metoda pro odstranění všech předmětů z databáze
+     */
     public void removeAll(){
         
         ArrayList<Predmety> predmetyAll = new ArrayList(this.findAll()) ;

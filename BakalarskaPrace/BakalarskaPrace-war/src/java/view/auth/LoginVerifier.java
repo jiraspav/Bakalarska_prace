@@ -4,13 +4,19 @@
  */
 package view.auth;
 
+import app.qualifiers.Logout;
+import app.qualifiers.Login;
 import app.encrypt.EncryptUtil;
-import app.facade.login.LoginFacade;
+import app.facade.register.RegisterFacade;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.event.Event;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -32,10 +38,12 @@ public class LoginVerifier implements Serializable{
     private @Inject FacesMessengerUtil faceUtil;
     private @Inject ResourceBundleOperator bundle;
     //private @Inject LoginServiceEJB loginService;
-    private @Inject LoginFacade loginFac;
+    private @Inject RegisterFacade registerFac;
+    private @Inject @Login Event<String> loginEvent;
+    private @Inject @Logout Event<String> logoutEvent;
     private @Inject SessionHolderMB session;
     private @Inject NavigationBean naviBean;
-    private @Inject EncryptUtil encrypt;
+    private @Inject EncryptUtil crypt;
     
     
     private String login,password;
@@ -47,6 +55,23 @@ public class LoginVerifier implements Serializable{
     public LoginVerifier() {
     }
 
+    
+    /**
+     * Metoda pro přesměrování v případě, že je nějaký uživatel na prohlížeči přihlášen
+     */
+    public void initRedirect(){
+    
+        if(getExternalContext().getUserPrincipal() != null){
+            try {
+                    getExternalContext().redirect("../BakalarskaPrace-war/welcome.faces");
+            } catch (IOException ex) {
+                Logger.getLogger(LoginVerifier.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+    }
+    
+    
     /**
      * metoda zajišťující autentizaci proti aplikačnímu serveru
      * @return String pomocí něhož se rozhodne na kterou stránku se má pokračovat
@@ -54,22 +79,28 @@ public class LoginVerifier implements Serializable{
     public String login(){
         
         
-        
-        FacesContext ctx = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest) ctx.getExternalContext().getRequest();
-        
-        if(request.getUserPrincipal() == null){
+        if(getExternalContext().getUserPrincipal() == null){
             try {
-                request.login(login, Base64.encode(password.getBytes()));
-                session.saveNewSession(login, password);
+                    getHttpServletRequest().login(login, crypt.encode(password));
+                    loginEvent.fire(getExternalContext().getUserPrincipal().getName());
                 
             } catch (ServletException ex) {
-
+                
+                try {
+                    getHttpServletRequest().getSession(false).invalidate();
+                } catch (NullPointerException nulEx) {
+                    return null;
+                }
+                
                 return naviBean.validationFail();
             }
+            
+            return naviBean.success();
         }
-        
         return naviBean.success();
+        
+            
+        
         
     }
     
@@ -80,14 +111,11 @@ public class LoginVerifier implements Serializable{
      */
     public String logout(){
         
-        session.killSession();
-        
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) ec.getRequest();
         try {
             
-            request.logout();
-            ec.invalidateSession();
+            getHttpServletRequest().logout();
+            logoutEvent.fire(session.getLoggedUzivatelLogin());
+            
             
         } catch (ServletException ex) {
             Logger.getLogger(LoginVerifier.class.getName()).log(Level.SEVERE, null, ex);
@@ -103,7 +131,7 @@ public class LoginVerifier implements Serializable{
      */
     public void register(){
             
-            String response = loginFac.register(regLogin,regPassword);
+            String response = registerFac.register(regLogin,regPassword);
         
             if(response.equalsIgnoreCase("completed")){
                 
@@ -122,14 +150,13 @@ public class LoginVerifier implements Serializable{
             }
     }
     
-    //--------------------------NUTNO ZMENIT-----------------------
     
-    public boolean isAdmin(){
-        return true;
+    private HttpServletRequest getHttpServletRequest(){
+        return (HttpServletRequest) getExternalContext().getRequest();
     }
-    
-    
-    
+    private ExternalContext getExternalContext(){
+        return FacesContext.getCurrentInstance().getExternalContext();
+    }
     //--------------------------------------------------------------------------
     //-------------------------GETTERS, SETTERS---------------------------------
     //--------------------------------------------------------------------------
@@ -190,24 +217,4 @@ public class LoginVerifier implements Serializable{
     public void setRegPassword(String regPassword) {
         this.regPassword = regPassword;
     }
-    /**
-     * metoda zjišťující prioritu zadané role
-     * defaultní hodnoty jsou: student,ucitel,guest,admin
-     * pro jiné hodnoty vrací 0
-     * @param role role pro kterou hledáme prioritu
-     * @return prioritu zadané role
-     */
-    public int getRolePriority(String role){
-        if(role.equals("admin"))
-            return 3;
-        else if(role.equals("guest")|| role.equals("ucitel"))
-            return 2;
-        else if(role.equals("student"))
-            return 1;
-        else
-            return 0;
-    }
-
-
-
 }

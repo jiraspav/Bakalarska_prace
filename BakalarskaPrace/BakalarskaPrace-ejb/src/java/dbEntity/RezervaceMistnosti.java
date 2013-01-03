@@ -108,6 +108,18 @@ public class RezervaceMistnosti implements Serializable {
         this.status = status;
     }
     
+    public RezervaceMistnosti(Integer id,Uzivatel uziv, Mistnost mistnost,Date datumRezervace, Date od, Date do1, int pocetMist, String popis, String status) {
+        this.iDrezervace = id;
+        this.iDuser = uziv;
+        this.iDmistnosti = mistnost;
+        this.datumRezervace = datumRezervace;
+        this.od = od;
+        this.do1 = do1;
+        this.pocetRezervovanychMist = pocetMist;
+        this.popis = popis;
+        this.status = status;
+    }
+    
     public Integer getIDrezervace() {
         return iDrezervace;
     }

@@ -12,10 +12,9 @@ import app.baseDataOperators.RozvrhyOperator;
 import app.baseDataOperators.SemestrOperator;
 import app.baseDataOperators.StrediskoOperator;
 import app.baseDataOperators.UpdateRozvrhuOperator;
+import app.baseDataOperators.VyucujiciOperator;
 import app.facade.databaseRefresh.DatabaseRefreshFacade;
-import dbEntity.RezervaceMistnosti;
-import dbEntity.UpdateRozvrhu;
-import java.text.SimpleDateFormat;
+import dbEntity.Uzivatel;
 import javax.ejb.Asynchronous;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -37,39 +36,47 @@ public class DatabaseRefreshServiceEJB implements DatabaseRefreshFacade{
     private @Inject MistnostOperator mistOper;
     private @Inject UpdateRozvrhuOperator updateOper;
     private @Inject ParserController parsCon;
+    private @Inject VyucujiciOperator vyuOper;
     
-    @Asynchronous
+    /**
+     * Metoda pro aktualizaci celé databáze. Zahrnuje kompletní smazání
+     * potřebných dat a nahrání nových.
+     * @param logged uživatel, který aktualizaci provádí
+     */
+    
     @Override
-    public void refreshDatabase() {
+    public void refreshDatabase(Uzivatel logged) {
         deleteDB();
-        fillDB();
+        fillDB(logged);
     }
     /**
      * metoda naplňující databázi
+     * @param logged 
      */
-    public void fillDB(){
+    private void fillDB(Uzivatel logged){
         if(strOper.getAll().isEmpty()){
-            parsCon.fillDepartments();
+            parsCon.fillDepartments(logged);
         }
         
-        parsCon.fillCourses();
+        parsCon.fillCourses(logged);
         
         if(mistOper.getAll().isEmpty()){
-            parsCon.fillRooms();
+            parsCon.fillRooms(logged);
         }
         
-        parsCon.fillRozvrhy();
-        parsCon.fillSemestr();
+        parsCon.fillRozvrhy(logged);
+        parsCon.fillSemestr(logged);
+        System.out.println("---DATABASE UPDATED---");
     }
     /**
      * metoda pro smazání databáze
      */
-    public void deleteDB(){
+    private void deleteDB(){
         
         rezOper.deleteAll();
         
         rozOper.deleteAll();
-        
+        vyuOper.deleteAll();
         predOper.deleteAll();
         
         /*
@@ -78,11 +85,15 @@ public class DatabaseRefreshServiceEJB implements DatabaseRefreshFacade{
          * 
          */
         
-        updateOper.deleteAll();
+        //updateOper.deleteAll();
         
-        semOper.deleteAll();
+        //semOper.deleteAll();
     }
     
+    /**
+     * Metoda pro získání datum poslední aktualizace databáze.
+     * @return textovou formu data poslední aktualizace
+     */
     @Override
     public String getLatestUpdate(){
         return updateOper.getLastUpdate().getFormattedDateUpdateRozvrhu();

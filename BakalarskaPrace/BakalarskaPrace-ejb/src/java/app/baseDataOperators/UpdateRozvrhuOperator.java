@@ -23,6 +23,14 @@ public class UpdateRozvrhuOperator {
     private @Inject UpdateRozvrhuFacade updateFac;
     
     
+    /**
+     * Metoda pro vytvoření a uložení nového objektu UpdateRozvrhu, který reprezentuje
+     * datum poslední aktualizace
+     * @param integer ID aktualizace
+     * @param current semestr ke kterému se aktualizace vztahuje
+     * @param date datum aktualizace
+     * @return vrací uloženou aktualizaci
+     */
     public UpdateRozvrhu createUpdateRozvrhu(Integer integer, Semestr current, Date date) {
         
         UpdateRozvrhu update = new UpdateRozvrhu(integer, date);
@@ -36,19 +44,27 @@ public class UpdateRozvrhuOperator {
         
     }
     
+    /**
+     * Metoda pro získání poslední aktualizace.
+     * @return poslední aktualizaci
+     */
     public UpdateRozvrhu getLastUpdate() {
         
         UpdateRozvrhu last;
             
         List<UpdateRozvrhu> vsechnyUpdaty = updateFac.findAll();
-        if(vsechnyUpdaty.size() > 0)
+        if(vsechnyUpdaty.size() > 0){
             last = vsechnyUpdaty.get(vsechnyUpdaty.size()-1);
-        else
+        }
+        else{
             last = new UpdateRozvrhu(1, new Date());
-        
+        }
         return last;
     }
 
+    /**
+     * Metoda pro odstranění celé historia aktualizací
+     */
     public void deleteAll() {
         updateFac.removeAll();
     }

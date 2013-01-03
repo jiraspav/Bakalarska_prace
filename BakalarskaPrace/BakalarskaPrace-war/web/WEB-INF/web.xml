@@ -5,7 +5,7 @@
         <param-value>Development</param-value>
     </context-param>
     <context-param>
-        <param-name>primefaces.THEME</param-name>  
+        <param-name>primefaces.THEME</param-name>
         <param-value>cupertino</param-value>
     </context-param>
     <servlet>
@@ -15,16 +15,17 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.faces</url-pattern>
+        <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
-            30
+            120
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>index.faces</welcome-file>
+        <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
+    
     <security-constraint>
         <display-name>admin only</display-name>
         <web-resource-collection>
@@ -43,7 +44,6 @@
             <web-resource-name>mistnostiRezervace</web-resource-name>
             <description/>
             <url-pattern>/mistnosti/*</url-pattern>
-            <url-pattern>/welcome.faces</url-pattern>
             <url-pattern>/welcome.xhtml</url-pattern>
             <url-pattern>/welcome.html</url-pattern>
         </web-resource-collection>
@@ -59,7 +59,7 @@
         <auth-method>FORM</auth-method>
         <realm-name>felResSysRealm</realm-name>
         <form-login-config>
-            <form-login-page>/index.faces</form-login-page>
+            <form-login-page>/index.xhtml</form-login-page>
             <form-error-page>/loginError.html</form-error-page>
         </form-login-config>
     </login-config>
