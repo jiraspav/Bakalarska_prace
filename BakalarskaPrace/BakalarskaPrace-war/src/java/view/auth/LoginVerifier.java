@@ -136,17 +136,17 @@ public class LoginVerifier implements Serializable{
             if(response.equalsIgnoreCase("completed")){
                 
                 faceUtil.addFacesMsgInfo(bundle.getMsg("sysMsgRegSucc"));
-                
+                regPassword = "";
             }
             else if(response.equalsIgnoreCase("alreadyRegistered")){
                 
                 faceUtil.addFacesMsgError(bundle.getMsg("sysMsgAlreadyReg"));
-                
+                regPassword = "";
             }
             else{
                 
                 faceUtil.addFacesMsgError(bundle.getMsg("sysMsgWrongPass"));
-                
+                regPassword = "";
             }
     }
     

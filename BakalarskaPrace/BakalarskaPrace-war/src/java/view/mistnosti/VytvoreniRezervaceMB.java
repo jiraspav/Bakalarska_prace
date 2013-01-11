@@ -57,8 +57,8 @@ public class VytvoreniRezervaceMB implements Serializable{
     private Date datumRezervace;
     private int pocetRezervovanychMist = 1;
     private String popis = " ";
-    private ArrayList<Integer> numbers;
-    private ArrayList<Integer> numbersRep;
+    private ArrayList<Integer> numbers; //pocet rezervovanych mist
+    private ArrayList<Integer> numbersRep; // pocet opakovani zadanych rezervaci
     private int pocetOpakovaní = 1;
     private int oldPocetOpakovaní = 1;
     
@@ -263,11 +263,9 @@ public class VytvoreniRezervaceMB implements Serializable{
     }
     
     private void fillNumbers() {
-        for(int i = 1; i < 200; i++){
-            getNumbers().add(i);
-        }
+        
         for(int i = 1; i < 11; i++){
-            getNumbersRep().add(i);
+            numbersRep.add(i);
         }
     }
     
@@ -441,6 +439,16 @@ public class VytvoreniRezervaceMB implements Serializable{
      * @return the numbers
      */
     public ArrayList<Integer> getNumbers() {
+        
+        numbers = new ArrayList<Integer>();
+        
+        if(selectedNode != null){
+            int pocetMist = mistOper.getMistnost(selectedNode.getData().toString()).getKapacita();
+            for(int i = 2; i <= pocetMist; i++){
+                numbers.add(i);
+            }
+        }
+        
         return numbers;
     }
 

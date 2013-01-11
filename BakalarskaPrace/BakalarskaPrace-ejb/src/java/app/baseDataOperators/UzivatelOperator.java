@@ -7,15 +7,13 @@ package app.baseDataOperators;
 import app.encrypt.EncryptUtil;
 import dbEntity.GroupTable;
 import dbEntity.Uzivatel;
-import entityFacade.DenVTydnuFacade;
 import entityFacade.GroupTableFacade;
 import entityFacade.UzivatelFacade;
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 /**
  *
@@ -59,7 +57,7 @@ public class UzivatelOperator {
 
         groupFac.create(groupTab);
         
-        uziv = createUzivatel(2, "testucitel", "admin", "Default učitel", "Nemá uveden.");
+        /*uziv = createUzivatel(2, "testucitel", "admin", "Default učitel", "Nemá uveden.");
 
         groupTab = new GroupTable("testucitel","ucitel");
 
@@ -69,7 +67,7 @@ public class UzivatelOperator {
 
         groupTab = new GroupTable("teststudent","student");
 
-        groupFac.create(groupTab);
+        groupFac.create(groupTab);*/
     }
     
     
