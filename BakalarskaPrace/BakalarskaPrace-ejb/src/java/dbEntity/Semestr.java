@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Semestr.findAll", query = "SELECT s FROM Semestr s"),
     @NamedQuery(name = "Semestr.findByIDsemestru", query = "SELECT s FROM Semestr s WHERE s.iDsemestru = :iDsemestru"),
-    @NamedQuery(name = "Semestr.findByKod", query = "SELECT s FROM Semestr s WHERE s.kod = :kod"),
+    @NamedQuery(name = "Semestr.findByKod", query = "SELECT s FROM Semestr s WHERE s.kod LIKE :kod"),
     @NamedQuery(name = "Semestr.findByZacina", query = "SELECT s FROM Semestr s WHERE s.zacina = :zacina"),
     @NamedQuery(name = "Semestr.findByKonci", query = "SELECT s FROM Semestr s WHERE s.konci = :konci")})
 public class Semestr implements Serializable {

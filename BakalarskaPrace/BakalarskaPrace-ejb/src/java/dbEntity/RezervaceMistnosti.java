@@ -21,12 +21,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "RezervaceMistnosti.findAll", query = "SELECT r FROM RezervaceMistnosti r"),
     @NamedQuery(name = "RezervaceMistnosti.findByIDrezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDrezervace = :iDrezervace"),
-    @NamedQuery(name = "RezervaceMistnosti.findByDatumRezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.datumRezervace = :datumRezervace AND r.status = :status"),
-    @NamedQuery(name = "RezervaceMistnosti.findByOd", query = "SELECT r FROM RezervaceMistnosti r WHERE r.od = :od AND r.status = :status"),
-    @NamedQuery(name = "RezervaceMistnosti.findByDo1", query = "SELECT r FROM RezervaceMistnosti r WHERE r.do1 = :do1 AND r.status = :status"),
-    @NamedQuery(name = "RezervaceMistnosti.findByIDuser", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDuser = :iDuser AND r.status = :status"),
-    @NamedQuery(name = "RezervaceMistnosti.findByIDmistnosti", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.status = :status"),
-    @NamedQuery(name = RezervaceMistnosti.FIND_BY_MISTNOST_A_DEN, query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.datumRezervace = :datumRezervace AND r.status = :status")})
+    @NamedQuery(name = "RezervaceMistnosti.findByDatumRezervace", query = "SELECT r FROM RezervaceMistnosti r WHERE r.datumRezervace = :datumRezervace AND r.status LIKE :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByOd", query = "SELECT r FROM RezervaceMistnosti r WHERE r.od = :od AND r.status LIKE :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByDo1", query = "SELECT r FROM RezervaceMistnosti r WHERE r.do1 = :do1 AND r.status LIKE :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByIDuser", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDuser = :iDuser AND r.status LIKE :status"),
+    @NamedQuery(name = "RezervaceMistnosti.findByIDmistnosti", query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.status LIKE :status"),
+    @NamedQuery(name = RezervaceMistnosti.FIND_BY_MISTNOST_A_DEN, query = "SELECT r FROM RezervaceMistnosti r WHERE r.iDmistnosti = :iDmistnosti AND r.datumRezervace = :datumRezervace AND r.status LIKE :status")})
 public class RezervaceMistnosti implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

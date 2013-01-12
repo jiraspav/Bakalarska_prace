@@ -20,8 +20,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = Uzivatel.FIND_ALL, query = "SELECT u FROM Uzivatel u"),
     @NamedQuery(name = Uzivatel.FIND_BY_ID, query = "SELECT u FROM Uzivatel u WHERE u.iDuser = :iDuser"),
-    @NamedQuery(name = Uzivatel.FIND_BY_LOGIN, query = "SELECT u FROM Uzivatel u WHERE u.login = :login"),
-    @NamedQuery(name = Uzivatel.FIND_BY_NAME, query = "SELECT u FROM Uzivatel u WHERE u.jmeno = :jmeno")})
+    @NamedQuery(name = Uzivatel.FIND_BY_LOGIN, query = "SELECT u FROM Uzivatel u WHERE u.login LIKE :login"),
+    @NamedQuery(name = Uzivatel.FIND_BY_NAME, query = "SELECT u FROM Uzivatel u WHERE u.jmeno LIKE :jmeno")})
 public class Uzivatel implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

@@ -46,7 +46,7 @@
                                     <div class="span9" >
                                         <p:dataTable id="tabulkaRezervaci" var="rez" value="#{mojeRezervaceBean.items}" rowKey="#{rez.IDrezervace}" paginator="true" paginatorAlwaysVisible="false" rows="5"
                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
-                                                    rowsPerPageTemplate="5,10,15,20" paginatorPosition="bottom">  
+                                                    rowsPerPageTemplate="5,10,15,20" paginatorPosition="bottom" emptyMessage="Nemáte žádné rezervace.">  
 
 
                                             <f:facet name="header">  
@@ -102,7 +102,7 @@
                                 <h:panelGroup id="formVytvoreniRezervace">
                                 <div class="row">  
                                     <div class="span4">
-                                        <p:panel>
+                                        <p:panel id="resValues">
                                         <div class="row">
                                             <div class="span1">
                                                 <p:outputLabel for="casOdVolne" value="#{msgs.volneMistnostiHeaderOD}"/>
@@ -155,7 +155,7 @@
                                         <div class="row">
                                             <br/>
                                             <div class="span4">   
-                                                <p:commandButton id="add2" value="Přidat rezervaci" actionListener="#{vytvoreniRezervaceBean.addReservationToList}" disabled="#{vytvoreniRezervaceBean.disabled}" update=":form:currentReservations :form:messages" process=":form:formVytvoreniRezervace" />
+                                                <p:commandButton id="add2" value="Přidat rezervaci" actionListener="#{vytvoreniRezervaceBean.addReservationToList}" disabled="#{vytvoreniRezervaceBean.disabled}" update=":form:currentReservations :form:messages :form:resValues" process="@parent" />
                                                 <br/>
                                             </div>
                                         </div>
@@ -250,7 +250,8 @@
                                         <f:facet name="header">Rezervace místnosti</f:facet>
                                         <p:schedule id="myschedule" value="#{scheduleMistnostiController.eventModel}" widgetVar="myschedule" 
                                                     draggable="false" resizable="false"
-                                                    timeZone="#{scheduleMistnostiController.timeZone}">  
+                                                    timeZone="#{scheduleMistnostiController.timeZone}" allDaySlot="false" firstHour="0"
+                                                    locale="cz">  
                                             <p:ajax event="eventSelect" listener="#{scheduleMistnostiController.onEventSelect}" /> 
 
                                         </p:schedule> 

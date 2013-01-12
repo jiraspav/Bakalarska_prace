@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(name = "typMistnosti")
 @NamedQueries({
-    @NamedQuery(name = TypMistnosti.FIND_BY_NAME, query = "SELECT m FROM TypMistnosti m WHERE m.nazev = :nazev"),
+    @NamedQuery(name = TypMistnosti.FIND_BY_NAME, query = "SELECT m FROM TypMistnosti m WHERE m.nazev LIKE :nazev"),
     @NamedQuery(name = TypMistnosti.FIND_BY_ID, query = "SELECT m FROM TypMistnosti m WHERE m.iDTypMistnosti = :iDTypMistnosti")})
 public class TypMistnosti implements Serializable {
     

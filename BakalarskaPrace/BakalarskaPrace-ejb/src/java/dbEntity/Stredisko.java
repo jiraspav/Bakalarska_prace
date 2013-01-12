@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Stredisko.findAll", query = "SELECT s FROM Stredisko s"),
     @NamedQuery(name = "Stredisko.findByIDstredisko", query = "SELECT s FROM Stredisko s WHERE s.iDstredisko = :iDstredisko"),
     @NamedQuery(name = "Stredisko.findByIdentCislo", query = "SELECT s FROM Stredisko s WHERE s.identCislo = :identCislo"),
-    @NamedQuery(name = "Stredisko.findByNazev", query = "SELECT s FROM Stredisko s WHERE s.nazev = :nazev")})
+    @NamedQuery(name = "Stredisko.findByNazev", query = "SELECT s FROM Stredisko s WHERE s.nazev LIKE :nazev")})
 public class Stredisko implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

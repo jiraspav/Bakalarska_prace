@@ -119,7 +119,7 @@ public class VytvoreniRezervaceMB implements Serializable{
      * Metoda pro přidávání rezervací do seznamu a zároveň kontrola zda se nový seznam vejde do místnosti
      */
     public void addReservationToList(){
-        
+        //System.out.println("addReservationToList");
         if(datumRezervace != null && doCas != null && odCas != null && odCas.before(doCas)){
             
             if(popis == null){

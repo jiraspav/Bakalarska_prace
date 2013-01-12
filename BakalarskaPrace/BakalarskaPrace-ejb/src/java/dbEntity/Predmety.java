@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Predmety.findAll", query = "SELECT p FROM Predmety p"),
     @NamedQuery(name = "Predmety.findByIDpredmetu", query = "SELECT p FROM Predmety p WHERE p.iDpredmetu = :iDpredmetu"),
-    @NamedQuery(name = "Predmety.findByZkratka", query = "SELECT p FROM Predmety p WHERE p.zkratka = :zkratka")})
+    @NamedQuery(name = "Predmety.findByZkratka", query = "SELECT p FROM Predmety p WHERE p.zkratka LIKE :zkratka")})
 public class Predmety implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
