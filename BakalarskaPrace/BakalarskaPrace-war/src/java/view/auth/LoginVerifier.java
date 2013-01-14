@@ -13,8 +13,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Event;
 import javax.faces.context.ExternalContext;
@@ -45,7 +49,7 @@ public class LoginVerifier implements Serializable{
     private @Inject NavigationBean naviBean;
     private @Inject EncryptUtil crypt;
     
-    
+    private String footerDate;
     private String login,password;
     private String regLogin,regPassword;
     
@@ -55,6 +59,14 @@ public class LoginVerifier implements Serializable{
     public LoginVerifier() {
     }
 
+    @PostConstruct
+    private void init(){
+        Date curr = new Date();
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(curr);
+        footerDate = Integer.toString(cal.get(Calendar.YEAR));
+    }
+    
     
     /**
      * Metoda pro přesměrování v případě, že je nějaký uživatel na prohlížeči přihlášen
@@ -63,7 +75,7 @@ public class LoginVerifier implements Serializable{
     
         if(getExternalContext().getUserPrincipal() != null){
             try {
-                    getExternalContext().redirect("../BakalarskaPrace-war/welcome.faces");
+                    getExternalContext().redirect("../BakalarskaPrace-war/welcome.xhtml");
             } catch (IOException ex) {
                 Logger.getLogger(LoginVerifier.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -216,5 +228,19 @@ public class LoginVerifier implements Serializable{
      */
     public void setRegPassword(String regPassword) {
         this.regPassword = regPassword;
+    }
+
+    /**
+     * @return the footerDate
+     */
+    public String getFooterDate() {
+        return footerDate;
+    }
+
+    /**
+     * @param footerDate the footerDate to set
+     */
+    public void setFooterDate(String footerDate) {
+        this.footerDate = footerDate;
     }
 }

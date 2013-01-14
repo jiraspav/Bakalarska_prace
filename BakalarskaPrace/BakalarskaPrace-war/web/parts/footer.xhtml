@@ -7,7 +7,9 @@
     <ui:composition>
         <div id="footer" class="hidden-phone bottom">
             
-            <h:outputText value="ČVUT © 2012" />
+            <h:outputFormat value="#{msgs.footer}" >
+                <f:param value="#{LoginVerifier.footerDate}" />
+            </h:outputFormat>
                 
         </div>
         

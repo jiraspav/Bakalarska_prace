@@ -195,7 +195,7 @@
 
                                                     <p:dataGrid id="currentReservations" columns="1" var="res" value="#{vytvoreniRezervaceBean.draggableRes}" emptyMessage="Žádné rezervace." >
                                                     <p:column>
-                                                        <p:panel id="draggedres" header="">
+                                                       
                                                             <h:panelGrid columns="5" style="width:100%">
                                                                 <h:outputText value="#{res.formatedDatumRezervace}"/>
                                                                 <h:outputText value="#{res.formatedOd}"/>
@@ -204,8 +204,6 @@
                                                                 <p:commandButton id="selectButton" actionListener="#{vytvoreniRezervaceBean.deleteSelected(res)}" process="@this" update="currentReservations" icon="ui-icon-trash" title="Delete"/>
                                                             </h:panelGrid>
 
-                                                        </p:panel>
-                                                        <p:draggable for="draggedres" revert="true" />
 
                                                     </p:column>
                                                     </p:dataGrid>
@@ -348,7 +346,6 @@
 
                                                                 <p:dataGrid id="currentReservations2" columns="1" var="res" value="#{volneMistnostiBean.draggableRes}" emptyMessage="Žádné rezervace." >
                                                                     <p:column>
-                                                                        <p:panel id="draggedres2" header="">
                                                                             <h:panelGrid columns="5" style="width:100%">
                                                                                 <h:outputText value="#{res.formatedDatumRezervace}"/>
                                                                                 <h:outputText value="#{res.formatedOd}"/>
@@ -356,8 +353,6 @@
                                                                                 <h:outputText value="#{res.formatedDo1}"/>
                                                                                 <p:commandButton actionListener="#{volneMistnostiBean.deleteSelected(res)}" update="currentReservations2 :form:volneMistnosti :form:tab3savePrepared" icon="ui-icon-trash" process="@this" title="Delete"/>
                                                                             </h:panelGrid>
-
-                                                                        </p:panel>
 
                                                                     </p:column>
                                                                 </p:dataGrid>
