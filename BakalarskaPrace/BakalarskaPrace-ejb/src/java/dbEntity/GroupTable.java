@@ -27,7 +27,7 @@ public class GroupTable implements Serializable {
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
-    @Column(name = "LOGIN")
+    @Column(name = "USERNAME")
     private String login;
 
     

@@ -18,7 +18,7 @@ public class GrouptablePK implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 128)
-    @Column(name = "USERNAME")
+    @Column(name = "LOGIN")
     private String username;
     @Basic(optional = false)
     @NotNull

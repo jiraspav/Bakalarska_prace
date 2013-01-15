@@ -45,7 +45,9 @@
                             <h:outputLabel for="regPass" value="Heslo: " />  
                             <p:password id="regPass" value="#{LoginVerifier.regPassword}"/>
                             <p:commandButton value="Registrovat" actionListener="#{LoginVerifier.register}" update="regMsgs eventDetails" process="@parent" />  
+                            
                         </h:panelGrid>
+                        <h:outputText value="*Login a hlavní přístupové heslo do systému KOS" style="font-size: 10px" />
                     </h:form>
                     
                           
